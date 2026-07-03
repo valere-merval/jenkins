@@ -1,0 +1,14 @@
+# vim:ft=ansible:
+
+---
+
+# Available packages
+pricingdata_packages_list:
+  - KAM
+  - LTN
+  - TWE
+  - VL_NPS_EBPB
+  - pakmap
+  - nvs-abo-verbund
+  - LTBW
+  - LTBW-ABO

@@ -1,0 +1,10 @@
+version: v3
+license: LicenseRef-DBISL
+contacts: psx@deutschebahn.com
+confidentiality: internal
+reference-ids:
+  - A-100226
+  - A-100436
+  - A-100606
+protected-branches:
+  - master

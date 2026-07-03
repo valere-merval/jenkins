@@ -1,0 +1,17 @@
+# vim:ft=ansible:
+
+---
+
+- ec2_metadata_facts:
+
+- name: ensure hafas_dir exists
+  file: path={{ hafas_dir }} state=directory
+
+- name: enable maintenance mode
+  file: path={{ app_home }}/work/_disable_ state=touch mode=0644
+
+- include_tasks: pricingdata.yml
+
+- name: disable maintenance mode
+  file: path={{ app_home }}/work/_disable_ state=absent
+

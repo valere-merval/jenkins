@@ -1,0 +1,17 @@
+# vim:ft=ansible:
+
+---
+
+- name: enable/disable construction site
+  become: true
+  lineinfile:
+    dest: '{{ app_home }}/{{ item }}'
+    regexp: '^(booking_redirectionMode\s+)'
+#    line: '\1hiddenBooking'
+    line: '\1overloadServer'
+    backrefs: yes
+  with_items:
+    - httpd/bin/cgi.cfg
+    - httpd/bin/mobil/cgi.cfg
+  when: ec2_tag_Subsystem is defined and ec2_tag_Subsystem == "web"
+

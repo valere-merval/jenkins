@@ -1,0 +1,7 @@
+[TARIFDIR]
+{% for pool in tarifdata_pools %}
+{{ pool.key }}=/{{ tarifdata_dir }}/{{ pool.version }}{% if pool.valid_from is defined %},<{{ pool.valid_from }}|{{ pool.valid_to }}>
+{% else %}
+
+{% endif %}
+{% endfor %}

@@ -1,0 +1,14 @@
+# vim:ft=ansible:
+
+---
+
+- ec2_metadata_facts:
+
+- name: enable maintenance mode
+  file: path={{ app_home }}/work/_disable_ state=touch mode=0644
+
+- include_tasks: masterdata.yml
+
+- name: disable maintenance mode
+  file: path={{ app_home }}/work/_disable_ state=absent
+

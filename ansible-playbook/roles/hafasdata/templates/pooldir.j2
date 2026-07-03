@@ -1,0 +1,4 @@
+[POOLDIR]
+{% for key, pool in hafasdata_pools.items() %}
+{{ pool.uic }}={{ hafasdata_pools_dir }}/{{ key }},Enabled
+{% endfor %}

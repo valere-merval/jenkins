@@ -1,0 +1,8 @@
+[POOLINFO]
+Type=Locations
+Subtype=Station
+Poolflag=4
+PoolUIC=199
+CompatibleTo=80,120,199
+Format=4,4,4,1,50
+

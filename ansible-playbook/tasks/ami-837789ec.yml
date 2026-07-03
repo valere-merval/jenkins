@@ -1,0 +1,51 @@
+# vim:ft=ansible:
+
+---
+
+#- debug: var=hostvars[ansible_host]
+
+- name: update cgi.cfg
+  become: true
+  lineinfile:
+    dest: "{{ app_home }}/{{ item }}"
+    regexp: "^HYBRIDSUCHE_active"
+    line: "HYBRIDSUCHE_active  1"
+  with_items:
+    - httpd/bin/cgi.cfg
+  when: ec2_tag_Subsystem is defined and ec2_tag_Subsystem == "web"
+
+- name: update dbmobile.cfg
+  become: true
+  lineinfile:
+    dest: "{{ app_home }}/httpd/bin/addons/dbmobile.cfg"
+    regexp: "^AUSKUNFTURL_CLD_PERCENTAGE="
+    line: "AUSKUNFTURL_CLD_PERCENTAGE=0"
+  notify: update signature
+  when: ec2_tag_Subsystem is defined and ec2_tag_Subsystem == "web"
+
+- name: update bannerfiles web (In-App-Communication)
+  become: true
+  copy:
+    src: "{{ item }}"
+    dest: "{{ app_home }}/httpd/bin/addons/{{ item }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: 0644
+  with_items:
+    - bannerfile_ios.txt
+    - bannerfile_android.txt
+  when: ec2_tag_Subsystem is defined and ec2_tag_Subsystem == "web"
+
+- name: update bannerfiles hafas (In-App-Communication)
+  become: true
+  copy:
+    src: "{{ item }}"
+    dest: "{{ app_home }}/auskunft/preisdaten/config/{{ item }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: 0644
+  with_items:
+    - bannerfile_ios.txt
+    - bannerfile_android.txt
+  when: ec2_tag_Subsystem is defined and ec2_tag_Subsystem == "hafas"
+

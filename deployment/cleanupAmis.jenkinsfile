@@ -1,0 +1,123 @@
+pipeline {
+    agent { 
+        label 'master'
+    }
+
+   triggers {
+        cron('20 0 * * 6')
+    }
+
+
+    options {
+        disableConcurrentBuilds()
+    }
+
+    parameters {
+        string(name: 'BIBE_OLDEST_AMI_MONTHS', defaultValue: '6', description: 'Anzahl Monate die die AMIs aufgehoben werden')
+        string(name: 'APPSRV_OLDEST_AMI_MONTHS', defaultValue: '12', description: 'Anzahl Monate die die AMIs aufgehoben werden')
+    }
+
+    stages {
+        stage('Cleanup AMIs'){
+            steps {
+                    sh '''#!/bin/bash +x
+                    #
+                    #
+                    DEBUG=""
+                    VISUAL="N"
+                    #
+                    # last bibe ami 6 months age
+                    # last appserv ami 12 months age
+                    #
+                    
+                    CURRDATE=`date +%Y-%m-%d`
+                    BIBELASTDATE=`date -d "${BIBE_OLDEST_AMI_MONTHS} month ago" +%F`
+                    APPSRVLASTDATE=`date -d "${APPSRV_OLDEST_AMI_MONTHS} month ago" +%F`
+                    COUNTER=0
+                    declare -a SEARCHARRAY=("psx-*-imageMaster")
+                    #
+                    #
+                    function deregister()
+                    {
+                    
+                       if [ $(echo ${1} | grep "ami-") ]; then
+                    
+                          [[ "${VISUAL}" == "Y" ]] && set -x
+                    
+                          ${DEBUG} aws --region eu-central-1 ec2 deregister-image --image-id ${1}
+                    
+                          [[ "${VISUAL}" == "Y" ]] && set +x
+                    
+                       elif [ $(echo ${1} | grep "snap-") ]; then
+                    
+                          [[ "${VISUAL}" == "Y" ]] && set -x
+                    
+                          ${DEBUG} aws --region eu-central-1 ec2 delete-snapshot --snapshot-id ${1}
+                    
+                          [[ "${VISUAL}" == "Y" ]] && set +x
+                    
+                       else
+                    
+                          echo "Nothing to do!" && exit 0
+                    
+                       fi
+                    
+                       echo "${1} deleted." >> deregistered_amis_${CURRDATE}.log
+                       echo "${1} deleted."
+                    
+                    }
+                    #
+                    echo "############################################################################################" > deregistered_amis_${CURRDATE}.log
+                    for NAME in ${SEARCHARRAY[@]};
+                    do
+                    
+                       declare -a AMIARRAY=($(aws --region eu-central-1 ec2 describe-images --owners self --filters Name=name,Values=*${NAME}* --query 'Images[].[ImageId,CreationDate,Name,BlockDeviceMappings[].Ebs.SnapshotId]' --output text|tr -d " "))
+                    
+                       for ((i=0;i<${#AMIARRAY[@]};i=i+4));
+                       do
+                    
+                          if [ $(echo ${AMIARRAY[$i+1]:0:10}|tr -d "-") -le $(echo ${APPSRVLASTDATE}|tr -d "-") ] && [ $(echo ${AMIARRAY[$i+2]}|egrep "psx-appsrv") ]; then
+                    
+                             echo "~~~~~~~~${AMIARRAY[$i+2]} from ${AMIARRAY[$i+1]:0:10}:" >> deregistered_amis_${CURRDATE}.log
+                             echo "~~~~~~~~${AMIARRAY[$i+2]} from ${AMIARRAY[$i+1]:0:10}:"
+                    
+                             deregister ${AMIARRAY[$i]} ${AMIARRAY[$i+2]} && deregister ${AMIARRAY[$i+3]} ${AMIARRAY[$i+2]}
+                             COUNTER=$((${COUNTER} + 1))
+                    
+                          elif [ $(echo ${AMIARRAY[$i+1]:0:10}|tr -d "-") -le $(echo ${BIBELASTDATE}|tr -d "-") ] && [ $(echo ${AMIARRAY[$i+2]}|egrep  "psx-bibe") ]; then
+                    
+                             echo "~~~~~~~~${AMIARRAY[$i+2]} from ${AMIARRAY[$i+1]:0:10}:" >> deregistered_amis_${CURRDATE}.log
+                             echo "~~~~~~~~${AMIARRAY[$i+2]} from ${AMIARRAY[$i+1]:0:10}:"
+                    
+                             deregister ${AMIARRAY[$i]} ${AMIARRAY[$i+2]} && deregister ${AMIARRAY[$i+3]} ${AMIARRAY[$i+2]}
+                             COUNTER=$((${COUNTER} + 1))
+                          fi
+                    
+                    
+                    
+                       done
+                    
+                    done
+                    
+                    
+                    echo "####################################### SUMMARY ############################################" >> deregistered_amis_${CURRDATE}.log
+                    echo "####################################### SUMMARY ############################################"
+                    echo " " >> deregistered_amis_${CURRDATE}.log
+                    echo " "
+                    echo ${COUNTER} "amis deregistered successfully." >> deregistered_amis_${CURRDATE}.log
+                    echo ${COUNTER} "amis deregistered successfully."
+                    echo " " >> deregistered_amis_${CURRDATE}.log
+                    echo " "
+                    echo "####################################### SUMMARY ############################################" >> deregistered_amis_${CURRDATE}.log
+                    echo "####################################### SUMMARY ############################################"
+                    exit 0
+
+					'''
+
+                    
+            }  
+        }
+    }
+}
+
+

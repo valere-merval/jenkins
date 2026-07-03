@@ -1,0 +1,16 @@
+# vim:ft=ansible:
+
+---
+
+bootstrap: False
+
+hafasdata_pools_dir: '{{ hafas_dir | dirname }}/pools'
+tarifdata_dir: '{{ hafasdata_pools_dir }}/tarif'
+
+hafasdata_cache_dir: /tmp
+hafasdata_s3_bucket: '{{ ansible_ec2_instance_identity_document_accountid }}-common-daten'
+
+pricing_proxy_config_dir: '/app/bdirekt/home/komfort/auskunft/pricing/config'
+
+s3_retries: 3
+

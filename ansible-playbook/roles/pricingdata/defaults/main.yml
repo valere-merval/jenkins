@@ -1,0 +1,12 @@
+# vim:ft=ansible:
+
+---
+
+bootstrap: False
+
+pricingdata_dir: '{{ auskunft_basedir }}/preisdaten'
+pricingdata_cache_dir: /tmp
+pricingdata_s3_bucket: '{{ ansible_ec2_instance_identity_document_accountid }}-common-daten'
+
+s3_retries: 3
+

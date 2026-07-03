@@ -1,0 +1,15 @@
+# vim:ft=ansible:
+
+---
+
+- name: remove-packages | remove apache 2.2, this is an update to the "old" state
+  yum:
+    name: httpd, httpd-tools, mod_security
+    state: absent
+
+- name: amazon-packages | ensure required packages from amazon linux are present
+  environment:
+    http_proxy: http://internal-dev-infra-proxy-i-916647673.eu-central-1.elb.amazonaws.com:8080
+  yum:
+    name: httpd24, mod24_security, netpbm
+    state: present

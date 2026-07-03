@@ -1,0 +1,11 @@
+state:
+
+  bucket: 556971410989-common-daten
+  prefix: stammdaten
+
+packages:
+
+- name: version
+  bucket: '556971410989-common-daten'
+  prefix: 'stammdaten'
+  pattern: 'FSTD_R2.*_V.*\.zip'

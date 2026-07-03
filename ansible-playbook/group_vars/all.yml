@@ -1,0 +1,36 @@
+# vim:ft=ansible:
+
+---
+
+region: eu-central-1
+s3_retries: 5
+
+bootstrap: False
+skip_restart_handler: False
+
+app_user: '{{ bibe_user }}'
+app_home: '{{ bibe_homedir }}'
+
+auskunft_basedir: '{{ app_home }}/auskunft'
+
+hafas_dir: '{{ auskunft_basedir }}/plandaten/data'
+hafasdata_cache_dir: '/var/app/{{ cache_user }}/cache'
+
+pricingdata_dir: '{{ auskunft_basedir }}/preisdaten/data'
+pricingdata_config_dir: '{{ auskunft_basedir }}/preisdaten/config'
+pricingdata_cache_dir: '/var/app/{{ cache_user }}/cache'
+
+app_bindir: '{{ app_home }}/bin'
+masterdata_cache_dir: '/var/app/{{ cache_user }}/cache'
+masterdata_s3_region: 'eu-central-1'
+
+environment_name: '{{ ec2_tag_Environment }}'
+
+is_image_master: False
+
+cronjobs: []
+
+metrics:
+  playbook: Auskunft-Auto-Update
+  namespace: AlertingMetrics
+

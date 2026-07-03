@@ -1,0 +1,8 @@
+---
+
+environment_type: PROD
+
+dev: false
+preprod: false
+prod: true
+

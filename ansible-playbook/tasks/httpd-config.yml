@@ -1,0 +1,58 @@
+# vim:ft=ansible:
+
+---
+
+# Create new config files
+- name: httpd.conf | prepare httpd.conf
+  become: true
+  become_user: root
+  template:
+    src: templates/httpd/conf/httpd.conf
+    dest: /etc/httpd/conf/httpd.conf
+    owner: root
+    group: root
+    mode: "u=rw,g=r,o=r"
+
+- name: "generating {{ item }} | prepare"
+  become: true
+  become_user: root
+  template:
+    src: "templates/httpd/conf.d/{{ item }}"
+    dest: "/etc/httpd/conf.d/{{ item }}"
+    owner: root
+    group: root
+    mode: "u=rw,g=r,o=r"
+  with_items:
+    - 05-mod_security.conf
+    - 10-reiseauskunft.bahn.de.conf
+    - 15-mobile.bahn.de.conf
+    - 16-mobile.bahn.de_8081.conf
+    - 30-127.0.0.1.conf
+    - mod_security.conf
+  when: ec2_tag_Subsystem is defined and ec2_tag_Subsystem == "web"
+
+- name: "generating {{ item }} | prepare"
+  become: true
+  become_user: root
+  template:
+    src: "templates/httpd/conf.d/{{ item }}"
+    dest: "/etc/httpd/conf.d/{{ item }}"
+    owner: root
+    group: root
+    mode: "u=rw,g=r,o=r"
+  with_items:
+    - 05-mod_security.conf
+    - 01-pf.conf
+    - 30-127.0.0.1.conf
+    - mod_security.conf
+  when: ec2_tag_Subsystem is defined and ec2_tag_Subsystem == "pfweb"
+
+- name: httpd module configurations | copy without templating
+  become: true
+  become_user: root
+  copy:
+    src: files/httpd/conf.modules.d/
+    dest: /etc/httpd/conf.modules.d/
+    owner: root
+    group: root
+    mode: "u=rw,g=r,o=r"

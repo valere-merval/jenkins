@@ -1,0 +1,7 @@
+[POOLINFO]
+Type=Locations
+Subtype=Poi
+Poolflag=40
+PoolUIC=105
+CompatibleTo=105
+Format=4,4,4,1,50

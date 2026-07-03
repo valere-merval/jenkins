@@ -1,0 +1,13 @@
+ps -eF | grep vbf_k90 | grep 'httpd -f' | wc -l | awk '{print "APACHE processes running: "$1}' | sed 's/ 0/ 0 !!!!! ATTENTION !!!!!/g'
+if [ $(df -m . | grep -o [0-9][0-9]*% | sed 's/\%//') -ge "90" ]; then echo '!!!!! ATTENTION CAUTION DISK FULL !!!!!'; fi
+cat /app/kurs90/int/install/akt/version-prog
+echo k90_EKTR19 $(cat /app/kurs90/int/install/akt/data/akt/dm/k90-daten-version)
+echo KAM $(cat /app/kurs90/int/install/akt/data/akt/dm/version | sed 's/version=EPA3-\(Q\|K\|H\|L\)//g')
+cat /app/kurs90/int/install/akt/data/akt/efz/?/version-plandat
+cat /app/kurs90/int/install/akt/data/akt/twe/version-twedat
+cat /app/kurs90/int/install/akt/data/akt/vv/version-vvdatnew
+cat /app/kurs90/int/install/akt/data/akt/ltn/version-ltndat
+cat /app/kurs90/int/install/akt/data/akt/ltbw/version-ltbwdat
+/app/kurs90/vbf_k90/tools/verbindungstest.sh >/dev/null 2>&1
+/app/kurs90/vbf_k90/tools/proc_count.sh | grep -v '1\|##\|end of\|vorschau' | sed 's/ 0/ 0 !!!!! ATTENTION !!!!!/g'
+uname -r

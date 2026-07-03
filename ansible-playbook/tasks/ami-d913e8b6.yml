@@ -1,0 +1,30 @@
+# vim:ft=ansible:
+
+---
+
+- set_fact:
+    realTimeTrainConfig:
+      - name: realTimeTrainCategory
+        value: "ICE THA IC EC"
+      - name: realTimeTrainAdministration
+        value: "A6____ A6S1__ A6S11_ A6S31_ A6S32_ A6S4__ A6S41_ A6S42_ A6S5__ A6S51_ A6S52_ A6S6__ A6S9__ A8____ A9____ ak_AK_ AM____ AMRB__ AMRE__ AMSE__ AR____ C4____ CW____ EB____ EX____ F7____ H2____ H6____ H7____ HK____ K4____ LD____ LDTL__ LDTLX_ M8____ MD____ N1____ N2____ N4____ NXRB__ NXRE__ O0____ O9____ O9X___ ovfBAY ovfCOB ovfERL ovfGEM ovfNBG ovfNES ovfWBG OW____ R0____ R1____ R2____ R4____ R7____ rabRAB rbgRBS rbgRBS rbgSBG rboMB_ rbpRMB rbpRPB rbr001 rbrBMO rbrBOS rbrDRO rbrSNB RD____ rmpFAE rmpREB rmpRSG rvoRVO S1____ S9____ SB____ T8____ TR____ UW____ vbbBBG vbbBRB vbbBRT vbbBVB vbbBVT vbbBVU vbbCNB vbbCNT vbbFFB vbbFFT vbbHVG vbbOVG vbbRVS vbbSTE vbbVGP vbbVIT vrrb64 vrrb66 VW____ W0____ W3____ W9____ web002 web002 webBBU webBTR webWOL webXBR webXOL webXOS X1____ X2____ XD____ 01____ 02____ 03____ 04____ 05____ 06____ 07____ 800622 800640 80____ 0S____ 08____ 81____ 84____ 85____ 86____ 87____ NZ____ 19____ R4RH__ vvsSTB vu_VAB HX____ CXRB__ CXRE__ 82____ webVWG webYGO webYGS webYPE webYUE rbpRPB rbgRPB rbgRVS rvsSEV rbgBRN V6RB__ V6RE__ 80Bus_ mzbBUS Y8____ E0____"
+      - name: realTimeTrainCategory_exactTimes
+        value: ""
+      - name: realTimeTrainAdministration_exactTimes
+        value: "A6____ A6S1__ A6S11_ A6S31_ A6S32_ A6S4__ A6S41_ A6S42_ A6S5__ A6S51_ A6S52_ A6S6__ A6S9__ A8____ A9____ ak_AK_ AM____ AMRB__ AMRE__ AMSE__ AR____ C4____ CW____ EB____ EX____ F7____ H2____ H6____ H7____ HK____ K4____ LD____ LDTL__ LDTLX_ M8____ MD____ N1____ N2____ N4____ NXRB__ NXRE__ O0____ O9____ O9X___ ovfBAY ovfCOB ovfERL ovfGEM ovfNBG ovfNES ovfWBG OW____ R0____ R1____ R2____ R4____ R7____ rabRAB rbgRBS rbgRBS rbgSBG rboMB_ rbpRMB rbpRPB rbr001 rbrBMO rbrBOS rbrDRO rbrSNB RD____ rmpFAE rmpREB rmpRSG rvoRVO S1____ S9____ SB____ T8____ TR____ UW____ vbbBBG vbbBRB vbbBRT vbbBVB vbbBVT vbbBVU vbbCNB vbbCNT vbbFFB vbbFFT vbbHVG vbbOVG vbbRVS vbbSTE vbbVGP vbbVIT vrrb64 vrrb66 VW____ W0____ W3____ W9____ web002 web002 webBBU webBTR webWOL webXBR webXOL webXOS X1____ X2____ XD____ 01____ 02____ 03____ 04____ 05____ 06____ 07____ 800622 800640 0S____ 08____ 19____ R4RH__ vvsSTB vu_VAB HX____ CXRB__ CXRE__ 82____ webVWG webYGO webYGS webYPE webYUE rbpRPB rbgRPB rbgRVS rvsSEV rbgBRN V6RB__ V6RE__ mzbBUS Y8____ E0____"
+      - name: realTimeTrainOperator
+        value: ""
+      - name: realTimeTrainAdministration_noProgOffset
+        value: "87____"
+    
+- name: update hafas global.conf (Betreiber/Gattungen)
+  become: true
+  lineinfile:
+    dest: "{{ app_home }}/config/hafas/global.conf"
+    regexp: "^declare -a {{ item.name }}="
+    line: "declare -a {{ item.name }}=({{ item.value }})"
+    state: present
+  with_items: "{{ realTimeTrainConfig | default([]) }}"
+  when: ec2_tag_Subsystem is defined and ec2_tag_Subsystem == "hafas"
+  notify: restart hafas
+

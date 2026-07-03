@@ -1,0 +1,57 @@
+# vim:ft=ansible:
+
+---
+
+- set_fact: masterdata_version_file_local='/tmp/{{ masterdata_version_file }}'
+
+- name: get versions file
+  become: false
+  local_action:
+    module: aws_s3
+    region: '{{ ansible_ec2_placement_region }}'
+    bucket: '{{ masterdata_s3_bucket }}'
+    object: 'stammdaten/{{ masterdata_version_file }}'
+    dest: '{{ masterdata_version_file_local }}'
+    mode: get
+    retries: '{{ s3_retries | default(5) }}'
+  environment:
+    http_proxy: ''
+
+- set_fact: masterdata_package={{ lookup('timedcsvfile', 'version file={{ masterdata_version_file_local }} delimiter=; time_col=2 offset=300') }}
+- set_fact: masterdata_package_local="{{ masterdata_cache_dir }}/{{ masterdata_package | basename }}"
+
+- stat: path="{{ masterdata_package_local }}"
+  register: masterdata_package_local_file
+
+- name: retrieve package {{ masterdata_package }}
+  aws_s3:
+    region: "{{ ansible_ec2_placement_region }}"
+    bucket: "{{ masterdata_package | urlsplit('netloc') }}"
+    object: "{{ masterdata_package | urlsplit('path')}}"
+    dest: "{{ masterdata_package_local }}"
+    mode: get
+    retries: '{{ s3_retries | default(5) }}'
+  environment:
+    http_proxy: ''
+  when: masterdata_package_local_file.stat.exists == False
+
+- set_fact: masterdata_release={{ lookup('timedcsvfile', 'release file={{ masterdata_version_file_local }} delimiter=; time_col=2 offset=300') }}
+
+- name: delete file to prevent access conflicts
+  become: false
+  local_action:
+    module: file
+    path: '{{ masterdata_version_file_local }}'
+    state: absent
+
+- debug: msg="{{ app_bindir }}/bdimport -e {{ environment_type }} -v release={{ masterdata_release }} -v addons_subdir=addons -c {{ masterdata_mapping_file }} {{ masterdata_package_local }}"
+
+# TODO: resolve app_bindir
+- name: run bdimport
+  shell: "{{ app_bindir }}/bdimport -e {{ environment_type }} -v release={{ masterdata_release }} -v addons_subdir=addons -c {{ masterdata_mapping_file }} {{ masterdata_package_local }}"
+  register: result
+  changed_when: not ( result.stderr | regex_search("0 added, 2 updated") )
+  notify: restart hafas
+
+- debug: var=result
+

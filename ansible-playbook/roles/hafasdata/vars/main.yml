@@ -1,0 +1,23 @@
+# vim:ft=ansible:
+
+---
+
+# UIC of connection pool containing preview data
+preview_pool_uic: '81'
+
+# UIC of connection pool containing review data
+review_pool_uic: '81'
+
+# Available pools (for each entry a poolinfo must be provided)
+hafasdata_pools_list:
+  - adr
+  - bhf
+  - bike
+  - connection
+  - connection-preview
+  - connection-review
+  - entry
+  - ff
+  - mw
+  - poi
+

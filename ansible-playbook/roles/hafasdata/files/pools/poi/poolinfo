@@ -1,0 +1,70 @@
+[POOLINFO]
+Type=Locations
+Subtype=Poi
+PoolUIC=104
+Poolflag=8
+CompatibleTo=80,104
+Format=4,4,4,1,50
+DiskSpace= 8198577
+RAM-Space= 1234
+VirtSpace= 10269696
+LogoSmall=16,16,logos.bmp
+LogoGeo=184,168,karte.bmp
+Location=92887,,335
+Adjacent=103
+DataVersion= 20001014
+[PLAN]
+LOGOS.BMP=
+POOLINFO=
+PLANATR=
+PLANATX=
+PLANATXD=
+PLANATXE=
+PLANATXF=
+PLANATXI=
+PLANB=
+PLANBZ=
+PLANCON=
+PLANGAT=
+PLANGLS=
+PLANGRZ=
+PLANHOLI=
+PLANINFO=
+PLANK=
+PLANK32=
+PLANKANT=
+PLANKM=
+PLANLAUF=
+PLANMETA=
+PLANPHON=
+PLANRICH=
+PLANSORT=
+PLANSPR=
+PLANU=
+PLANUK=
+PLANW=
+PLANZUG=
+KARTE.BMP=
+PLANNG=
+PLANZZ=
+PLANLINE=
+PLANKGEO=
+PLANMW=
+PLANSZ=
+PLANBETR=
+[GER]
+NameShort=DB
+NameLong= "Daenemark POIs"
+InfoLong= "POIs 'Daenemark':\n\nIm Fahrplan 'Daenemark' sind alle Zugverbindungen der DSB in Daenemark enthalten."
+[ENG]
+NameShort=DB
+NameLong= "Daenemark POIs"
+InfoLong= "POIs 'Daenemark':\n\nIm Fahrplan 'Daenemark' sind alle Zugverbindungen der DSB in Daenemark enthalten."
+[FRA]
+NameShort=DB
+NameLong= "Daenemark POIs"
+InfoLong= "POIs 'Daenemark':\n\nIm Fahrplan 'Daenemark' sind alle Zugverbindungen der DSB in Daenemark enthalten."
+[ITA]
+NameShort=DB
+NameLong= "Daenemark POIs"
+InfoLong= "POIs 'Daenemark':\n\nIm Fahrplan 'Daenemark' sind alle Zugverbindungen der DSB in Daenemark enthalten."

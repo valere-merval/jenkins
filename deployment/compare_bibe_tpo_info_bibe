@@ -1,0 +1,9 @@
+ps -eF | grep nvs.*server[.]exe.*nvsbibefork | wc -l | awk '{print "NVS processes running: "$1}' | sed 's/ 0/ 0 !!!!! ATTENTION !!!!!/g'
+ps -eF | grep nvs.*server[.]exe.*abobibefork | wc -l | awk '{print "ABO processes running: "$1}' | sed 's/ 0/ 0 !!!!! ATTENTION !!!!!/g'
+if [ $(df -m . | grep -o [0-9][0-9]*% | sed 's/\%//') -ge "90" ]; then echo '!!!!! ATTENTION CAUTION DISK FULL !!!!!'; fi
+LD_LIBRARY_PATH=/home/nvs/lib /home/nvs/auskunft/server/bin/server.exe -v
+strings /home/nvs/lib/libpe.so.0 | grep PE-LIB-Version
+echo === Preisdaten ===;jq -r '.package' /home/nvs/auskunft/preisdaten/???/data/*/package_info.json | sed  -e 's/\.zip//' -e 's/\_FULL\.tar\.bz2//' | sort
+echo === Plandaten ===;jq -r '.package' /home/nvs/auskunft/plandaten/???/pools/*/package_info.json | sed -e 's/\.zip//' | sort
+echo === Stammdaten ===;grep Package ~nvs/config/bdirekt/fachlich.version | sed -e 's:^.*/::' -e 's/\.zip//'
+uname -r

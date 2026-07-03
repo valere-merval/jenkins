@@ -1,0 +1,72 @@
+# vim:ft=ansible:
+
+---
+
+- set_fact: hafasdata_pools="{% set dict = {} %}{{ dict }}"
+
+- set_fact: hafasdata_version_file_path='/tmp/{{ hafasdata_version_file }}'
+
+- name: get hafasdata versions file
+  become: false
+  local_action:
+    module: aws_s3
+    region: '{{ ansible_ec2_placement_region }}'
+    bucket: '{{ hafasdata_s3_bucket }}'
+    object: 'plandaten/{{ hafasdata_version_file }}'
+    dest: '{{ hafasdata_version_file_path }}'
+    mode: get
+    retries: '{{ s3_retries | default(5) }}'
+  environment:
+    http_proxy: ''
+
+- name: extract pools, versions and uic from configuration and poolinfo
+  set_fact: hafasdata_pools="{% set package = lookup('timedcsvfile', '{{ item }} file={{ hafasdata_version_file_path }} delimiter=; time_col=2 offset=300') %}{% set uic = lookup('ini', 'PoolUIC section=POOLINFO file=files/pools/' + item + '/poolinfo') %}{% if package | length > 0 %}{{ hafasdata_pools | combine({item:{'bucket':package|urlsplit('netloc'), 'object':package|urlsplit('path'), 'uic':uic}}) }}{% else %}{{ hafasdata_pools }}{% endif %}"
+  with_items: "{{ hafasdata_pools_list }}"
+
+- name: delete file to prevent access conflicts
+  become: false
+  local_action:
+    module: file
+    path: '{{ hafasdata_version_file_path }}'
+    state: absent
+
+- name: precheck if package exists
+  aws_s3:
+    region: '{{ ansible_ec2_placement_region }}'
+    bucket: '{{ item.value.bucket }}'
+    object: '{{ item.value.object }}'
+    mode: geturl
+    retries: '{{ s3_retries | default(5) }}'
+  environment:
+    http_proxy: ''
+  with_dict: '{{ hafasdata_pools }}'
+  changed_when: false
+
+- set_fact: preview_pool_enabled='{{ hafasdata_pools["connection-preview"] is defined }}'
+
+- set_fact: review_pool_enabled='{{ hafasdata_pools["connection-review"] is defined }}'
+
+- name: create pooldir and planstcl
+  template: src='{{ item }}.j2' dest='{{ hafas_dir }}/{{ item }}'
+  with_items:
+    - pooldir
+    - planstcl
+  notify: restart hafas
+
+- name: prepopulate pools
+  copy: src='pools/{{ item.key }}' dest='{{ hafasdata_pools_dir }}'
+  with_dict: '{{ hafasdata_pools }}'
+  notify: restart hafas
+
+- name: install hafasdata pools
+  include_tasks: install_pool.yml
+  loop: '{{ hafasdata_pools | dict2items }}'
+
+- name: install ngramm.ausnahmen from connection pool
+  copy:
+    src: '{{ hafasdata_pools_dir }}/connection/ngramm.ausnahmen'
+    dest: '{{ hafas_dir }}'
+    remote_src: yes
+  ignore_errors: true
+  notify: restart hafas
+

@@ -1,0 +1,16 @@
+ansible.cfg
+apply-master.yml
+dist.filelist
+files
+group_vars
+handlers
+inventories
+local.yml
+package.yml
+plandaten-bibe.yml
+preisdaten-bibe.yml
+restart-hafas-bibe.yml
+roles
+stammdaten-bibe.yml
+tasks
+templates

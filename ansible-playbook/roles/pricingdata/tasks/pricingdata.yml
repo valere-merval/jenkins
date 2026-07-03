@@ -1,0 +1,83 @@
+# vim:ft=ansible:
+
+---
+
+- set_fact: pricingdata_packages="{% set dict = {} %}{{ dict }}"
+
+- set_fact: pricingdata_version_file_path='/tmp/{{ pricingdata_version_file }}'
+
+- name: get pricingdata versions file
+  become: false
+  local_action:
+    module: aws_s3
+    region: '{{ ansible_ec2_placement_region }}'
+    bucket: '{{ pricingdata_s3_bucket }}'
+    object: 'preisdaten/{{ pricingdata_version_file }}'
+    dest: '{{ pricingdata_version_file_path }}'
+    mode: get
+    retries: '{{ s3_retries | default(5) }}'
+  environment:
+    http_proxy: ''
+
+- name: extract packages and versions from configuration and poolinfo
+  set_fact: pricingdata_packages="{% set package = lookup('timedcsvfile', '{{ item }} file={{ pricingdata_version_file_path }} delimiter=; time_col=2 offset=300') %}{% if package | length > 0 %}{{ pricingdata_packages | combine({item:{'bucket':package|urlsplit('netloc'), 'object':package|urlsplit('path')}}) }}{% else %}{{ pricingdata_packages }}{% endif %}"
+  with_items: "{{ pricingdata_packages_list }}"
+
+- name: delete file to prevent access conflicts
+  become: false
+  local_action:
+    module: file
+    path: '{{ pricingdata_version_file_path }}'
+    state: absent
+
+- name: precheck if package exists
+  aws_s3:
+    region: '{{ ansible_ec2_placement_region }}'
+    bucket: '{{ item.value.bucket }}'
+    object: '{{ item.value.object }}'
+    mode: geturl
+    retries: '{{ s3_retries | default(5) }}'
+  environment:
+    http_proxy: ''
+  with_dict: '{{ pricingdata_packages }}'
+  changed_when: false
+
+- name: prepopulate pools
+  copy: src='preisdaten/' dest='{{ pricingdata_dir }}'
+  notify: restart hafas
+
+- name: create directories if necessary
+  file: path='{{ pricingdata_dir }}/{{ item.key }}' state=directory mode=0755
+  with_dict: '{{ pricingdata_packages }}'
+
+- name: install pricingdata packages
+  include_tasks: install_package.yml
+  loop: '{{ pricingdata_packages | dict2items }}'
+
+- name: adjust Preisdaten.conf
+  lineinfile:
+    dest: '{{ pricingdata_config_dir }}/Preisdaten.conf'
+    regexp: ^PAKMAP=
+    line: PAKMAP=../pakmap/pakmap
+- name: adjust Preisdaten.conf
+  lineinfile:
+    dest: '{{ pricingdata_config_dir }}/Preisdaten.conf'
+    regexp: ^BBPV=
+    line: BBPV=../nvs-abo-verbund/dmbbpv
+- name: adjust Preisdaten.conf
+  lineinfile:
+    dest: '{{ pricingdata_config_dir }}/Preisdaten.conf'
+    regexp: ^TWTAPU=
+    line: TWTAPU=../nvs-abo-verbund/dmtwtapu
+  notify: restart hafas
+- name: adjust Preisdaten-abo.conf
+  lineinfile:
+    dest: '{{ pricingdata_config_dir }}/Preisdaten.conf'
+    regexp: ^BBPV=
+    line: BBPV=../nvs-abo-verbund/dmbbpv
+- name: adjust Preisdaten-abo.conf
+  lineinfile:
+    dest: '{{ pricingdata_config_dir }}/Preisdaten.conf'
+    regexp: ^TWTAPU=
+    line: TWTAPU=../nvs-abo-verbund/dmtwtapu
+  notify: restart hafas

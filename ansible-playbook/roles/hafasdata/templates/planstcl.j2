@@ -1,0 +1,85 @@
+% Dies ist eine Datei mit den verfahrensspezifschen Parametern fuer den Einsatz
+% von HAFAS als Internet-Server bei der DB.
+%
+% =======================================================
+% Diese Datei ist nicht fuer den Einsatz bei NVS geeignet
+% =======================================================
+%
+% =============================================================================
+%
+% Groesse von internen Feldern:
+% Groessere Speicherverbrauch vs. bessere Performance
+%
+MAX_DIREKT_CACHE           0
+MAX_KANTEN_CACHE     2000000
+%
+% In grossen Netzen (Fernverkehr + Nahverkehr) fuehrt ein hoeherer Wert von
+% MAX_NORM_VERGLEICHE zu besseren Ergebnissen. Bisheriger Standardwert beim
+% Betrieb des DB-Internet-Servers. nahonly_dist beschleunigt die Suche im
+% grossen Netz aus Fernverkehr + Nahverkehr.
+%
+MAX_NORM_VERGLEICHE  1000000	Maximale Anzahl Vergleiche
+%
+% Zeitbeschraenkung fuer Mehfachauskunft
+% ======================================
+%
+% Eine Anfrage in der Mehrfachauskunft kann mit einer zeitlichen Hoechstgrenze
+% versehen werden. Nach der vorgegeben Zeit werden dann keine weiteren
+% Verbindungen mehr gesucht. Die Zeit wird in Sekunden angegeben.
+% Dieser Wert wird nur verwendet, wenn in der Eingabstruktur in_ref der
+% Default-Wert -1 angegeben wurde.
+%
+maxseconds                 3    Maximale Suchzeit in Sekunden
+%
+% Tuning der nGramm-Suche fuer Internetbeduerfnisse.
+%
+nGramm_maxListe            400
+nGrammBew_Verkehre         100
+nGrammBew_nr_praefix       100
+query_ngramm_useNrPraefix  1
+query_ngramm_useStrLen     0
+%
+% Blaetter-Stack im BahnDirekt-Server immer auf 0!!
+%
+def_max_stack_height       0  Maximale Hoehe des Blaetter-Stacks
+%
+% Marginale Praefixberuecksichtigung
+%
+query_ngramm_usePraefix    1
+nGrammBew_praefix          1
+{% if preview_pool_enabled %}
+%
+% Parameter fuer Vorschaufahrplan
+% 
+suche_2_fp                 1
+vor_fp_intervall           0
+nach_fp_intervall        720
+{% endif %}
+{% if review_pool_enabled %}
+%
+% Parameter fuer Vorschaufahrplan
+%
+suche_2_fp                 1
+vor_fp_intervall           0
+nach_fp_intervall        720
+{% endif %}
+%
+%
+% (De)aktivierung der Integration von RIS/HIM-Nachrichten
+% =======================================================
+%
+% 0 : planrt und planrth einlesen
+% 1 : planrt nicht einlesen, planrth einlesen
+% 2 : planrt einlesen, planrth nicht einlesen
+% 3 : planrt nicht einlesen, planrth nicht einlesen
+%
+rt_skip_planrt_read        0
+%
+RT_DIREKT_CACHE            1000000
+%
+% Anpassung wegen TMT-16589
+% =========================
+MAX_WEGKNOTEN              8000
+MAX_ADJPOOL                110000
+%
+REF_NORM            13738317

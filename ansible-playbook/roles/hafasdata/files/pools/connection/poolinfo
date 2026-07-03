@@ -1,0 +1,71 @@
+[POOLINFO]
+Type=Basic
+Subtype=Station
+PoolUIC=80
+CompatibleTo=80
+Format=4,4,4,1,50
+MediaTest=
+MediaRoot=
+DiskSpace= 8198577
+RAM-Space= 1234
+VirtSpace= 10269696
+LogoSmall=
+LogoGeo=
+Location=92887,,335
+Adjacent=
+DataVersion= 20001014
+[PLAN]
+LOGOS.BMP=
+POOLINFO=
+PLANATR=
+PLANATX=
+PLANATXD=
+PLANATXE=
+PLANATXF=
+PLANATXI=
+PLANB=
+PLANBZ=
+PLANCON=
+PLANGAT=
+PLANGLS=
+PLANGRZ=
+PLANHOLI=
+PLANINFO=
+PLANK=
+PLANK32=
+PLANKANT=
+PLANKM=
+PLANLAUF=
+PLANMETA=
+PLANPHON=
+PLANRICH=
+PLANSORT=
+PLANSPR=
+PLANU=
+PLANUK=
+PLANW=
+PLANZUG=
+KARTE.BMP=
+PLANNG=
+PLANZZ=
+PLANLINE=
+PLANKGEO=
+PLANMW=
+PLANSZ=
+PLANBETR=
+[GER]
+NameShort=DB
+NameLong= "Deutschland DB"
+InfoLong= "Fahrplan 'DB':\n\nIm Fahrplan 'DB' sind alle Zugverbindungen der DB in Deutschland enthalten."
+[ENG]
+NameShort=DB
+NameLong= "Deutschland DB"
+InfoLong= "Fahrplan 'DB':\n\nIm Fahrplan 'DB' sind alle Zugverbindungen der DB in Deutschland enthalten."
+[FRA]
+NameShort=DB
+NameLong= "Deutschland DB"
+InfoLong= "Fahrplan 'DB':\n\nIm Fahrplan 'DB' sind alle Zugverbindungen der DB in Deutschland enthalten."
+[ITA]
+NameShort=DB
+NameLong= "Deutschland DB"
+InfoLong= "Fahrplan 'DB':\n\nIm Fahrplan 'DB' sind alle Zugverbindungen der DB in Deutschland enthalten."

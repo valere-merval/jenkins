@@ -1,0 +1,78 @@
+# vim:ft=ansible:
+
+---
+
+# --------------------------------------------------------------------------
+#  NVS-BIBE / ABO-BIBE Server
+# --------------------------------------------------------------------------
+
+- hosts: tag_Subsystem_bibe:&tag_ReferenceName_nvs
+
+  become: true
+  become_user: '{{ app_user }}'
+
+  pre_tasks:
+    - name: include /etc/ansible/vars.yml
+      include_vars: /etc/ansible/vars.yml
+      tags: always
+
+  roles:
+    - role: hafasdata
+      hafasdata_version_file: 'hafaspools-nvsbibe-{{ environment_name }}.csv'
+      hafas_dir: '{{ auskunft_basedir }}/plandaten/nvs/data'
+    - role: hafasdata
+      hafasdata_version_file: 'hafaspools-abobibe-{{ environment_name }}.csv'
+      hafas_dir: '{{ auskunft_basedir }}/plandaten/abo/data'
+    - role: pricingdata
+      pricingdata_version_file: 'preisdaten-nvsbibe-{{ environment_name }}.csv'
+      pricingdata_dir: '{{ auskunft_basedir }}/preisdaten/nvs/data'
+    - role: pricingdata
+      pricingdata_version_file: 'preisdaten-abobibe-{{ environment_name }}.csv'
+      pricingdata_dir: '{{ auskunft_basedir }}/preisdaten/abo/data'
+    - role: masterdata
+      masterdata_version_file: 'stammdaten-nvsbibe-{{ environment_name }}.csv'
+
+  handlers:
+    - include: handlers/main.yml
+
+# --------------------------------------------------------------------------
+#  Common for all servers
+# --------------------------------------------------------------------------
+
+- hosts: tag_ReferenceName_nvs
+
+  become: true
+
+  pre_tasks:
+    - name: include /etc/ansible/vars.yml
+      include_vars: /etc/ansible/vars.yml
+      tags: always
+
+  tasks:
+    - name: add configured crontab entries
+      become: true
+      cron:
+        name: '{{ item.name }}'
+        minute: '{{ item.minute }}'
+        hour: '{{ item.hour }}'
+        weekday: '{{ item.weekday }}'
+        day: '{{ item.day }}'
+        month: '{{ item.month }}'
+        user: '{{ item.user }}'
+        job: '{{ item.job }}'
+        state: '{{ item.state }}'
+      with_items: '{{ cronjobs | default([]) }}'
+      tags:
+        - cronjobs
+
+    #- name: check for post-processing tasks based on {{ ec2_image_id }}
+    #  local_action:
+    #    module: stat
+    #    path: 'tasks/{{ ec2_image_id }}.yml'
+    #  register: postprocess
+
+    #- include: 'tasks/{{ ec2_image_id }}.yml'
+    #  when: postprocess.stat.exists
+
+  handlers:
+    - include: handlers/main.yml

@@ -1,0 +1,12 @@
+# vim:ft=ansible:
+
+---
+
+bootstrap: False
+
+masterdata_cache_dir: /tmp
+masterdata_mapping_file: /app/nvs/home/nvs/mapping.cfg
+masterdata_s3_bucket: '{{ ansible_ec2_instance_identity_document_accountid }}-common-daten'
+
+s3_retries: 3
+

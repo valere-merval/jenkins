@@ -1,0 +1,12 @@
+- name: update cgi.cfg
+  become: true
+  lineinfile:
+    dest: "{{ app_home }}/httpd/bin/cgi.cfg"
+    regexp: "^{{ item.param }}\\s"
+    line: "{{ item.param }} {{ item.value}}"
+  with_items:
+    - { param: "numberOfConnectionsScroll", value: "3"}
+    - { param: "initialMinuteRound", value: "0"}
+    - { param: "initialMinuteOffset ", value: "0"}
+  when: ec2_tag_Subsystem is defined and ec2_tag_Subsystem == "web"
+

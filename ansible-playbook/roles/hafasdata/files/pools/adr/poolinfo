@@ -1,0 +1,38 @@
+[POOLINFO]
+Type=Locations
+Subtype=Address
+PoolUIC=103
+CompatibleTo=80,103
+Format=4,4,4,1,50
+DiskSpace= 8198577
+RAM-Space= 1234
+VirtSpace= 10269696
+LogoSmall=16,16,logos.bmp
+LogoGeo=184,168,karte.bmp
+Location=92887,,335
+Adjacent=102
+DataVersion= 20001014
+[PLAN]
+LOGOS.BMP=
+POOLINFO=
+PLANB=
+PLANSORT=
+KARTE.BMP=
+PLANNG=
+PLANKGEO=
+[GER]
+NameShort=DB
+NameLong= "Daenemark Adressen"
+InfoLong= "Adressen 'Daenemark':\n\nIm Fahrplan 'Daenemark' sind alle Zugverbindungen der DSB in Daenemark enthalten."
+[ENG]
+NameShort=DB
+NameLong= "Daenemark Addresses"
+InfoLong= "Adressen 'Daenemark':\n\nIm Fahrplan 'Daenemark' sind alle Zugverbindungen der DSB in Daenemark enthalten."
+[FRA]
+NameShort=DB
+NameLong= "Daenemark Addresses"
+InfoLong= "Adressen 'Daenemark':\n\nIm Fahrplan 'Daenemark' sind alle Zugverbindungen der DSB in Daenemark enthalten."
+[ITA]
+NameShort=DB
+NameLong= "Daenemark Addresses"
+InfoLong= "Adressen 'Daenemark':\n\nIm Fahrplan 'Daenemark' sind alle Zugverbindungen der DSB in Daenemark enthalten."

@@ -1,0 +1,14 @@
+# vim:ft=ansible:
+
+---
+
+# This is not used yet, but is a starting point to move cgi.bin config from bda_bootstrap_init.sh to ansible
+
+- name: cgi.cfg | prepare hafas cgi.cfg
+  become: true
+  template:
+    src: templates/hafas/cgi.cfg
+    dest: /app/bdirekt/home/komfort/httpd/bin/cgi.cfg
+    owner: komfort
+    group: komfort
+    mode: "u=rw,g=r,o=r"

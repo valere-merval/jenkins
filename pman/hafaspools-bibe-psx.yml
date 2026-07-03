@@ -1,0 +1,42 @@
+state:
+
+  bucket: '556971410989-common-daten'
+  prefix: 'plandaten'
+
+packages:
+
+- name: adr
+  bucket: '556971410989-common-daten'
+  prefix: 'plandaten/adr'
+  pattern: 'adr.*\.zip'
+
+- name: bhf
+  bucket: '556971410989-common-daten'
+  prefix: 'plandaten/bhf'
+  pattern: '.*\.zip'
+
+- name: connection
+  bucket: '556971410989-common-daten'
+  prefix: 'plandaten/connection'
+  pattern: '.*\_BIBE_Plandaten_J2.*\.zip'
+
+- name: connection-review
+  bucket: '556971410989-common-daten'
+  prefix: 'plandaten/connection-review'
+  pattern: '.*\_(BIBE|bibe)_Plandaten_J2.*\.zip'
+
+- name: connection-preview
+  bucket: '556971410989-common-daten'
+  prefix: 'plandaten/connection-preview'
+  pattern: '.*\_(BIBE|bibe)_Plandaten_J2.*\.zip'
+
+- name: entry
+  bucket: '556971410989-common-daten'
+  prefix: 'plandaten/entry'
+  pattern: '.*\.zip'
+
+- name: poi
+  bucket: '556971410989-common-daten'
+  prefix: 'plandaten/poi'
+  pattern: '.*\.zip'
+  

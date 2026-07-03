@@ -1,0 +1,40 @@
+---
+
+- name: download package ({{ item.value.object }})
+  aws_s3:
+    region: '{{ ansible_ec2_placement_region }}'
+    bucket: '{{ item.value.bucket }}'
+    object: '{{ item.value.object }}'
+    dest: '{{ hafasdata_cache_dir }}/{{ item.value.object | basename }}'
+    mode: get
+    overwrite: '{{ s3_package_overwrite | default("always") }}'
+  register: download_package_result
+  notify: restart hafas
+
+- block:
+
+  # this is pretty expensive so we do not let ansible compare
+  # all files if we know the package has not changed
+
+  - name: extract package ({{ item.value.object }})
+    ansible.builtin.unarchive:
+      src: '{{ hafasdata_cache_dir }}/{{ item.value.object | basename }}'
+      dest: '{{ hafasdata_pools_dir }}/{{ item.key }}'
+      remote_src: yes
+      list_files: yes
+      mode: 0644
+    register: extract_package_result
+
+  - name: compute package info
+    set_fact:
+      package_info:
+        package: "{{ item.value.object | basename }}"
+        content: "{{ extract_package_result.files }}"
+
+  - name: write package info to file
+    copy:
+      dest: '{{ hafasdata_pools_dir }}/{{ item.key }}/package_info.json'
+      content: |
+        {{ package_info | to_nice_json(indent=2) }}
+
+  when: download_package_result.changed == true

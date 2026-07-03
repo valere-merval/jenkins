@@ -1,0 +1,55 @@
+# vim:ft=ansible:
+
+---
+
+- hosts: tag_Subsystem_bibe:&tag_ReferenceName_nvs:&tag_Environment_{{ environment_name }}
+
+  tasks:
+    - local_action:
+        module: add_host
+        name: "{{ item.1 }}"
+        groups: selected_servers
+        server_index: "{{ item.0 + 1 }}"
+        server_count: "{{ play_hosts | length }}"
+      with_indexed_items: "{{ play_hosts }}"
+
+- hosts: selected_servers
+
+  serial: 1
+
+  become: true
+  become_user: '{{ app_user }}'
+
+  gather_facts: False
+
+  pre_tasks:
+    - debug: msg="SERVER-COUNTER {{ server_index }}/{{ server_count }}"
+
+    - name: check ssh connection before running tasks
+      become: false
+      local_action:
+        module: wait_for
+        host: "{{ inventory_hostname }}"
+        port: 22
+        timeout: 3
+      register: check_ssh_connection_result
+      ignore_errors: true
+
+#    - name: skip rest of play if ssh test failed
+#      meta: end_play
+#      when: "'failed' in check_ssh_connection_result"
+
+    - name: manually run gather facts
+      setup:
+
+  roles:
+    - role: hafasdata
+      hafasdata_version_file: 'hafaspools-nvsbibe-{{ environment_name }}.csv'
+      hafas_dir: '{{ auskunft_basedir }}/plandaten/nvs/data'
+    - role: hafasdata
+      hafasdata_version_file: 'hafaspools-abobibe-{{ environment_name }}.csv'
+      hafas_dir: '{{ auskunft_basedir }}/plandaten/abo/data'
+
+  handlers:
+    - include: handlers/main.yml
+

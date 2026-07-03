@@ -1,0 +1,73 @@
+# vim:ft=ansible:
+
+---
+
+- hosts: localhost
+
+  vars_prompt:
+
+    - name: "ami_id"
+      prompt: "AMI ID"
+      private: no
+      when: ami_id is not defined
+
+  tasks:
+
+    - ec2_metadata_facts:
+
+    - name: 'search image master for {{ ami_id }}'
+      ec2_ami_find:
+        owner: '{{ ansible_ec2_instance_identity_document_accountid }}'
+        region: '{{ region }}'
+        ami_id: '{{ ami_id }}'
+      register: ami
+
+    - debug: var=ami verbosity=1
+
+    - fail: msg='No image master found for AMI {{ ami_id }}'
+      when: '{{ ami.results | length == 0 }}'
+
+    - fail: msg='AMI {{ ami_id }} does not have ImageMaster tag'
+      when: "{{ ami.results[0].tags is not defined or ami.results[0].tags.ImageMaster is not defined }}"
+
+    - set_fact: ec2_instance_id="{{ ami.results[0].tags.ImageMaster }}"
+
+    - name: "get infos about instance {{ ec2_instance_id }}"
+      local_action:
+        module: ec2_remote_facts
+        region: "{{ region }}"
+        filters:
+          instance-id: "{{ ec2_instance_id }}"
+      register: instance_facts
+
+    - debug: var=instance_facts verbosity=1
+
+    - name: add image master to temporary host group
+      add_host: name="{{ instance_facts.instances[0].private_ip_address }}" groups=image_master
+      changed_when: false
+
+
+- hosts: image_master
+
+  remote_user: ec2-user
+
+  vars:
+    is_image_master: True
+
+  tasks:
+
+    - set_fact: ec2_image_id="{{ hostvars['localhost'].ami_id }}"
+
+    - name: check for post-processing tasks based on {{ ec2_image_id }}
+      local_action:
+        module: stat
+        path: 'tasks/{{ ec2_image_id }}.yml'
+      register: postprocess
+
+    - include: 'tasks/{{ ec2_image_id }}.yml'
+      when: postprocess.stat.exists
+
+  handlers:
+
+    - include: handlers/main.yml
+

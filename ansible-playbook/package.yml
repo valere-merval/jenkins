@@ -1,0 +1,61 @@
+---
+
+- hosts: localhost
+
+  connection: local
+
+  vars:
+    vpc: prod
+    bucket_name: "626197520175-bd-plays"
+    bucket_subfolder: "auskunft"
+    patch_version: 0
+
+  tasks:
+
+    - set_fact:
+        package_prefix: "auskunft-{{ branch_prefix }}"
+
+    - name: "check existing versions concerning {{ branch_prefix }}"
+      aws_s3:
+        region: eu-central-1
+        bucket: "{{ bucket_name }}"
+        mode: list
+        prefix: "{{ bucket_subfolder }}/{{ package_prefix }}"
+      register: bucket_listing
+
+    - set_fact:
+        patch_versions: "{% set tmp = [] %}{% for item in bucket_listing.s3_keys %}{{ tmp.append(item | regex_replace('^' + bucket_subfolder + '/' + package_prefix + '\\.P(.*)\\.tgz$', '\\1') | int) }}{% endfor %}{{ tmp }}"
+
+    - set_fact:
+        patch_version: "{{ patch_versions | sort | last + 1 }}"
+      when: patch_versions | length > 0
+
+    - set_fact:
+        package_name: "{{ package_prefix }}.P{{ patch_version }}.tgz"
+
+    - name: get kms facts
+      cloudformation_facts:
+        region: "eu-central-1"
+        stack_name: "{{ vpc }}-kms"
+
+    - set_fact:
+#        kms_key_id: "{{ cloudformation[vpc+'-kms'].stack_outputs['MasterKeyArn' + vpc | title] }}"
+        kms_key_id: "{{ cloudformation[vpc+'-kms'].stack_outputs['MasterKey' + vpc | title] }}"
+
+    # TODO: change this to ansible archive module when using Ansible > 2.4
+    - name: create package
+      shell: "tar cfz {{ package_name }} --exclude .git --exclude *.tgz *"
+
+#    - name: upload package
+#      aws_s3:
+#        region: eu-central-1
+#        bucket: "{{ bucket_subfolder}}/{{ bucket_name }}"
+#        src: "{{ package_name }}"
+#        mode: put
+#        encrypt: no
+#        headers: |
+#          x-amz-server-side-encryption-aws-kms-key-id={{ kms_key_id }},
+#          x-amz-server-side-encryption=aws:kms
+    - name: upload package
+      shell: "aws s3 cp --sse aws:kms --sse-kms-key-id {{ kms_key_id }} {{ package_name }} s3://626197520175-bd-plays/auskunft/{{ package_name }} --region eu-central-1"
+
