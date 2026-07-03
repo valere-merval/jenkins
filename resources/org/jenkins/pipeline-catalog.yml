@@ -1,0 +1,48 @@
+# Jenkins Pipeline-Katalog
+# Deklarative Übersicht der wichtigsten Job-Familien.
+# v2Path ist der empfohlene Jenkins Script Path in der neuen Repository-Struktur.
+# legacyPath bleibt als technische Referenz/Fallback im Repository erhalten.
+
+jobFamilies:
+  dataDeployment:
+    description: BIBE/TPO-Dateneinsatz inklusive Reset, Vergleich und PMAN-gesteuerter Abläufe.
+    previousPath: deployment/BIBE_TPO_DataDeployment.Jenkinsfile
+    legacyPath: pipelines/legacy/deployment/BIBE_TPO_DataDeployment.Jenkinsfile
+    v2Path: pipelines/v2/deployment/BIBE_TPO_DataDeployment.Jenkinsfile
+    owners: [operations]
+    riskLevel: high
+  bibeSoftwareDeployment:
+    description: PE/SERVER-Synchronisierung, Image-Master-Update, Snapshot-Erstellung und BIBE-Rollout.
+    previousPath: deployment/BIBE_SWEinsatz.Jenkinsfile
+    legacyPath: pipelines/legacy/deployment/BIBE_SWEinsatz.Jenkinsfile
+    v2Path: pipelines/v2/deployment/BIBE_SWEinsatz.Jenkinsfile
+    owners: [operations]
+    riskLevel: high
+  tpoSoftwareDeployment:
+    description: TPO-Software-Versionierung, direkte Installation und Base-Image-Deployment.
+    previousPath: deployment/TPO_SWEinsatz.Jenkinsfile
+    legacyPath: pipelines/legacy/deployment/TPO_SWEinsatz.Jenkinsfile
+    v2Path: pipelines/v2/deployment/TPO_SWEinsatz.Jenkinsfile
+    owners: [operations]
+    riskLevel: high
+  environmentLifecycle:
+    description: Start, Stop, Preview/Review-Umschaltung und terminierte Umgebungsabläufe.
+    previousPath: deployment/onOffEnvinroment.Jenkinsfile
+    legacyPath: pipelines/legacy/deployment/onOffEnvinroment.Jenkinsfile
+    v2Path: pipelines/v2/deployment/onOffEnvinroment.Jenkinsfile
+    owners: [operations]
+    riskLevel: high
+  configuration:
+    description: Jenkins-Konfigurationsgenerierung.
+    previousPath: configuration/modifyConfigurationGroovy.Jenkinsfile
+    legacyPath: pipelines/legacy/configuration/modifyConfigurationGroovy.Jenkinsfile
+    v2Path: pipelines/v2/configuration/modifyConfigurationGroovy.Jenkinsfile
+    owners: [platform]
+    riskLevel: medium
+  maintenance:
+    description: AMI-Cleanup, Plugin-Downloads, Pipeline-Refresh und weitere Wartungsjobs.
+    previousPath: deployment/
+    legacyPath: pipelines/legacy/deployment/
+    v2Path: pipelines/v2/deployment/
+    owners: [platform]
+    riskLevel: medium

@@ -1,0 +1,13 @@
+# Local IDE/workstation files
+.idea/
+.vscode/
+*.iml
+
+# Build / validation artifacts
+build/
+.tmp/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db

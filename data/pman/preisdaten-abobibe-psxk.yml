@@ -1,0 +1,42 @@
+state:
+
+  bucket: '556971410989-common-daten'
+  prefix: 'preisdaten'
+
+packages:
+
+- name: VL_NPS_EBPB
+  bucket: '556971410989-common-daten'
+  prefix: 'preisdaten/VL_NPS_EBPB'
+  pattern: 'EPA3-K_29.*FULL\.tar\.bz2'
+
+- name: KAM
+  bucket: '556971410989-common-daten'
+  prefix: 'preisdaten/KAM'
+  pattern: 'EPA3-K_1901000.*FULL\.tar\.bz2'
+
+- name: TWE
+  bucket: '556971410989-common-daten'
+  prefix: 'preisdaten/TWE'
+  pattern: 'TWE_REL.*_V.*_2.*\.zip'
+
+- name: pakmap
+  bucket: '556971410989-common-daten'
+  prefix: 'preisdaten/pakmap'
+  pattern: 'pakmap_2.*\.zip'
+
+- name: LTN
+  bucket: '556971410989-common-daten'
+  prefix: 'preisdaten/LTN'
+  pattern: 'LTN_R2.*_V.*_2.*\.zip'
+
+- name: nvs-abo-verbund
+  bucket: '556971410989-common-daten'
+  prefix: 'preisdaten/nvs-abo-verbund'
+  pattern: 'ABOVERB_R2.*_V.*_2.*\.zip'
+
+- name: LTBW-ABO
+  bucket: '556971410989-common-daten'
+  prefix: 'preisdaten/LTBW-ABO'
+  pattern: 'LTBW-ABO_R2.*_V.*_2.*\.zip'
+
