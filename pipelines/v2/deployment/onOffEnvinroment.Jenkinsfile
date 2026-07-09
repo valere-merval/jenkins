@@ -1,6 +1,5 @@
 #!groovy
 @Library('jenkins') _
-import org.jenkinsci.plugins.pipeline.modeldefinition.Utils
 
 def stageParamsMap = [
     h: [ action: '-' ],
@@ -46,14 +45,14 @@ pipeline {
                         def currentAction = params["env_$key"]
                         branches[key] = {
                             def subBranches = [:]
-                            subBranches["BIBE ${currentKey}"] = { stage("BIBE ${currentKey}", currentAction != '-', {
+                            subBranches["BIBE ${currentKey}"] = { jenkinsOps.conditionalStage("BIBE ${currentKey}", currentAction != '-', {
                                 def bibeStackParameterMap = getStackParameters("nvs-psx${currentKey}-bibe")
                                 bibeStackParameterMap.each { parameter, value ->
                                     setValueInConfigFile("${env.PARENT_DIR}nvs-psx${currentKey}-bibe.cfg", parameter, value, "Parameters")
                                     currentBuild.description += "BIBE ${currentKey} : ${parameter} = ${value}\n"
                                 }
                             })}
-                            subBranches["TPO ${currentKey}"] = { stage("TPO ${currentKey}", currentAction != '-', {
+                            subBranches["TPO ${currentKey}"] = { jenkinsOps.conditionalStage("TPO ${currentKey}", currentAction != '-', {
                                 def tpoStackParameterMap = getStackParameters("tpo-psx${currentKey}-appsrv")
                                 tpoStackParameterMap.each { parameter, value ->
                                     setValueInConfigFile("${env.PARENT_DIR}tpo-psx${currentKey}-appsrv.cfg", parameter, value, "Parameters")
@@ -81,7 +80,7 @@ pipeline {
                     def branches = [:]
                     stageParamsMap.each { key, value ->
                         def action = params["env_$key"]
-                        branches[key] = { stage(key, action != '-', {
+                        branches[key] = { jenkinsOps.conditionalStage(key, action != '-', {
                             if (action == 'on') {
                                 value.action = 1
                                 valuesToRemoveMap[key] = "done"
@@ -119,7 +118,7 @@ pipeline {
                         def currentValue = value
                         branches[key] = {
                             def subBranches = [:]
-                            subBranches["BIBE ${currentKey}"] = { stage("BIBE ${currentKey}", currentValue.action != '-', {
+                            subBranches["BIBE ${currentKey}"] = { jenkinsOps.conditionalStage("BIBE ${currentKey}", currentValue.action != '-', {
                                 if (params.bibeAmi != '') {
                                     setValueInConfigFile("${env.PARENT_DIR}nvs-psx${currentKey}-bibe.cfg", "NvsBibeGoldenImageAmi", params.bibeAmi, "Parameters")
                                     echo "New ${currentKey}-BIBE AMI: ${params.bibeAmi}"
@@ -129,7 +128,7 @@ pipeline {
                                     echo "Current ${currentKey}-BIBE AMI: ${bibeStackParameterMap['NvsBibeGoldenImageAmi']}"
                                 }
                             })}
-                            subBranches["TPO ${currentKey}"] = { stage("TPO ${currentKey}", currentValue.action != '-', {
+                            subBranches["TPO ${currentKey}"] = { jenkinsOps.conditionalStage("TPO ${currentKey}", currentValue.action != '-', {
                                 if (params.tpoAmi != '') {
                                     setValueInConfigFile("${env.PARENT_DIR}tpo-psx${currentKey}-appsrv.cfg", "AmiId", params.tpoAmi, "Parameters")
                                     echo "New ${currentKey}-TPO AMI: ${params.tpoAmi}"
@@ -160,7 +159,7 @@ pipeline {
                             def currentValue = value
                             branches[key] = {
                                 def subBranches = [:]
-                                subBranches["BIBE ${currentKey}"] = { stage("BIBE ${currentKey}", currentValue.action != '-', {
+                                subBranches["BIBE ${currentKey}"] = { jenkinsOps.conditionalStage("BIBE ${currentKey}", currentValue.action != '-', {
                                     catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
                                         def returnStatus = sh (
                                             script: "./update-stack_new.py nvs-psx${currentKey}-bibe.cfg",
@@ -177,7 +176,7 @@ pipeline {
                                         }
                                     }
                                 })}
-                                subBranches["TPO ${currentKey}"] = { stage("TPO ${currentKey}", currentValue.action != '-', {
+                                subBranches["TPO ${currentKey}"] = { jenkinsOps.conditionalStage("TPO ${currentKey}", currentValue.action != '-', {
                                     catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
                                         def returnStatus = sh (
                                             script: "./update-stack_new.py tpo-psx${currentKey}-appsrv.cfg",
@@ -234,13 +233,6 @@ pipeline {
     }
 }
 
-
-def stage(name, execute, block) {
-    return stage(name, execute ? block : {
-        echo 'Stage "' + name + '" skipped due to when conditional.'
-        Utils.markStageSkippedForConditional(STAGE_NAME)
-    })
-}
 
 def catConfigfile() {
     String response = sh( script: "cat /var/jenkins_home/jenkinsDateneinsatzConfig/Configuration.groovy", returnStdout: true)

@@ -39,6 +39,7 @@ Wichtige Dateien:
 
 - `vars/jenkinsOps.groovy`: zentrale Pipeline-Fassade für Agent, Credentials, Arbeitsverzeichnisse und Jenkins-Helfer.
 - `vars/jsDeployment.groovy`: fachliche Deployment-Helfer.
+- `vars/jsDataDeployment.groovy`: umfangreiche Active-Choices-Parameter und PMAN-Datenstrukturen für Dateneinsatz-Pipelines.
 - `vars/jsAws.groovy`: AWS-Helfer.
 - `vars/jsQuality.groovy`: Validierungs-Helfer.
 - `src/org/jenkins/Defaults.groovy`: zentrale Konstanten.

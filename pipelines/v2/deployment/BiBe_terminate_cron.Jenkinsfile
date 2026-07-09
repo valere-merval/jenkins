@@ -1,6 +1,5 @@
 #!groovy
 @Library('jenkins') _
-import org.jenkinsci.plugins.pipeline.modeldefinition.Utils
 Envs_2_terminate = [
     //All: ['h', 'i', 'j', 'k', 'l', 'm', 'q'],
     TT:  [
@@ -74,7 +73,7 @@ pipeline {
                     Envs_2_terminate[Umgebungen].each { key, value ->
                         env.envs="${key} ${env.envs}"
                     }
-                    run_with_ssh_agent("./compare_bibe_tpo.sh A $envs")
+                    jenkinsOps.runDeploymentShell("./compare_bibe_tpo.sh A $envs")
                 }
             }
         }
@@ -115,19 +114,4 @@ pipeline {
             }
         }
     }
-}
-
-def run_with_ssh_agent(shell_code) {
-    jenkinsOps.withDeploymentScripts {
-        jenkinsOps.withSshAgent {
-            sh script: shell_code
-        }
-    }
-}
-
-def stage(name, execute, block) {
-    return stage(name, execute ? block : {
-        echo 'Stage "' + name + '" skipped due to when conditional.'
-        Utils.markStageSkippedForConditional(STAGE_NAME)
-    })
 }

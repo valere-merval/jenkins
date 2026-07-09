@@ -1,6 +1,5 @@
 #!groovy
 @Library('jenkins') _
-import org.jenkinsci.plugins.pipeline.modeldefinition.Utils
 
 
 def configurationMap = [

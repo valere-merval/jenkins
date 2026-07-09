@@ -1,4 +1,5 @@
 import org.jenkins.Defaults
+import org.jenkinsci.plugins.pipeline.modeldefinition.Utils
 
 /**
  * Main shared-library facade for Jenkins pipelines.
@@ -88,6 +89,14 @@ def runDeploymentScriptCommand(String shellCode, Map config = [:]) {
     }
 }
 
+/**
+ * Backwards-compatible deployment command helper for V2 Jenkinsfiles.
+ * Executes a shell command from scripts/deployment inside the configured ssh-agent.
+ */
+def runDeploymentShell(String shellCode, Map config = [:]) {
+    runDeploymentScriptCommand(shellCode, config)
+}
+
 def runScript(String scriptName, List args = [], Map config = [:]) {
     String quotedArgs = args.collect { value -> shellQuote(value as String) }.join(' ')
     String command = quotedArgs ? "./${scriptName} ${quotedArgs}" : "./${scriptName}"
@@ -160,15 +169,91 @@ def applyParameters(List parameterDefinitions) {
 }
 
 def buildBooleanParam(String name, Object value) {
-    return booleanParam(name: name, value: value == true || value == 'true' || value == 'enable')
+    return booleanParam(name: name, value: asBoolean(value))
 }
 
-def triggerJob(String jobName, Map booleanParams = [:], Map options = [:]) {
-    def downstreamParams = booleanParams.collect { key, value -> buildBooleanParam(key as String, value) }
-    return build job: jobName,
-        parameters: downstreamParams,
-        propagate: options.get('propagate', true),
-        wait: options.get('wait', true)
+def buildStringParam(String name, Object value) {
+    return string(name: name, value: value == null ? '' : value.toString())
+}
+
+def buildJobParameter(String name, Object value) {
+    if (!name?.trim()) {
+        error('Downstream build parameter name must not be empty')
+    }
+
+    if (value instanceof Boolean || value in ['true', 'false', 'enable', '-']) {
+        return buildBooleanParam(name, value)
+    }
+
+    return buildStringParam(name, value)
+}
+
+def triggerJob(String jobName, Map paramsMap = [:], Map options = [:]) {
+    if (!jobName?.trim()) {
+        error('triggerJob requires a non-empty job name')
+    }
+
+    List downstreamParams = paramsMap.collect { key, value ->
+        buildJobParameter(key as String, value)
+    }
+
+    Map buildArgs = [
+        job: jobName,
+        propagate: asBoolean(options.get('propagate', true)),
+        wait: asBoolean(options.get('wait', true))
+    ]
+
+    if (!downstreamParams.isEmpty()) {
+        buildArgs.parameters = downstreamParams
+    }
+    if (options.containsKey('quietPeriod')) {
+        buildArgs.quietPeriod = options.quietPeriod as Integer
+    }
+
+    return build(buildArgs)
+}
+
+def asBoolean(Object value) {
+    return value == true || value?.toString()?.equalsIgnoreCase('true') || value == 'enable'
+}
+
+def conditionalStage(String name, Object execute, Closure block) {
+    return stage(name, asBoolean(execute) ? block : {
+        echo 'Stage "' + name + '" skipped due to when conditional.'
+        Utils.markStageSkippedForConditional(STAGE_NAME)
+    })
+}
+
+def readConfigFile(String configPath = Defaults.CONFIG_FILE) {
+    return sh(script: "cat ${shellQuote(configPath)}", returnStdout: true)
+}
+
+def parsedConfig(String configPath = Defaults.CONFIG_FILE) {
+    return new ConfigSlurper().parse(new File(configPath).toURI().toURL())
+}
+
+def isEnvironmentActive(String environment, String configPath = Defaults.CONFIG_FILE) {
+    def deactivated = parsedConfig(configPath).envs_deactivated ?: []
+    return !deactivated.contains(environment)
+}
+
+def dataTypeName(String dataType) {
+    switch (dataType) {
+        case 'EKTR_19':
+        case 'EKTR_29':
+            return 'VL_NPS_EBPB'
+        case 'nvs_abo_verbund':
+        case 'tpo_verbund':
+            return 'nvs-abo-verbund'
+        case 'LTBW_ABO':
+            return 'LTBW-ABO'
+        case 'connection_review':
+            return 'connection-review'
+        case 'connection_preview':
+            return 'connection-preview'
+        default:
+            return dataType
+    }
 }
 
 def unstableStage(Closure body) {

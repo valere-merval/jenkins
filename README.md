@@ -59,6 +59,8 @@ jenkinsOps.withDeploymentScripts { ... }
 jenkinsOps.withSshAgent { ... }
 jenkinsOps.withPman { ... }
 jenkinsOps.withUpdateStack { ... }
+jenkinsOps.triggerJob('job-name', [FLAG: true], [wait: true])
+jsDataDeployment.bibeTpoParameters()
 ```
 
 ## Dokumentation

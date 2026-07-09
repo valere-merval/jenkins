@@ -1,6 +1,5 @@
 #!/usr/bin/env groovy
 @Library('jenkins') _
-import org.jenkinsci.plugins.pipeline.modeldefinition.Utils
 
 // Used Scripts & Files:
 // -----------------------------------------------------------------------
@@ -169,7 +168,7 @@ pipeline {
                         expression { params.createSnapshot || params.PE || params.SERVER || params.kernel_update }
                     }
                     steps{
-                        run_with_ssh_agent("./BIBE_run_update_IM.sh \'${imageMaster}\'")
+                        jenkinsOps.runDeploymentShell("./BIBE_run_update_IM.sh \'${imageMaster}\'")
                     }
                 }
             }
@@ -180,7 +179,7 @@ pipeline {
                 expression { params.SW_S3Sync && params.PE }
             }
             steps{
-                run_with_ssh_agent("./BIBE_PE_S3Sync.sh \'${RELEASE}\'")
+                jenkinsOps.runDeploymentShell("./BIBE_PE_S3Sync.sh \'${RELEASE}\'")
             }
         }
 
@@ -190,7 +189,7 @@ pipeline {
             }
             steps{
                 catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                    run_with_ssh_agent("./BIBE_PE_CheckVersion.sh \'${RELEASE}\' \'${PE_Subversion}\' \'${imageMaster}\'")
+                    jenkinsOps.runDeploymentShell("./BIBE_PE_CheckVersion.sh \'${RELEASE}\' \'${PE_Subversion}\' \'${imageMaster}\'")
                 }
             }
         }
@@ -200,7 +199,7 @@ pipeline {
                 expression { params.PE }
             }
             steps{
-                run_with_ssh_agent("./BIBE_PE_UpdateIM.sh \'${RELEASE}\' \'${PE_Subversion}\' \'${imageMaster}\'")
+                jenkinsOps.runDeploymentShell("./BIBE_PE_UpdateIM.sh \'${RELEASE}\' \'${PE_Subversion}\' \'${imageMaster}\'")
             }
         }
 
@@ -209,7 +208,7 @@ pipeline {
                 expression { params.SW_S3Sync && params.SERVER }
             }
             steps{
-                run_with_ssh_agent("./BIBE_SERVER_S3Sync.sh \'${current_server_release}\'")
+                jenkinsOps.runDeploymentShell("./BIBE_SERVER_S3Sync.sh \'${current_server_release}\'")
             }
         }
 
@@ -219,7 +218,7 @@ pipeline {
             }
             steps{
                 catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                    run_with_ssh_agent("./BIBE_SERVER_CheckVersion.sh \'${imageMaster}\' \'${SERVER_VERSION}\'")
+                    jenkinsOps.runDeploymentShell("./BIBE_SERVER_CheckVersion.sh \'${imageMaster}\' \'${SERVER_VERSION}\'")
                 }
             }
         }
@@ -229,7 +228,7 @@ pipeline {
                 expression { params.SERVER }
             }
             steps{
-                run_with_ssh_agent("./BIBE_SERVER_UpdateIM.sh \'${imageMaster}\' \'${SERVER_VERSION}\'")
+                jenkinsOps.runDeploymentShell("./BIBE_SERVER_UpdateIM.sh \'${imageMaster}\' \'${SERVER_VERSION}\'")
             }
         }
 
@@ -238,7 +237,7 @@ pipeline {
                 expression { params.createSnapshot }
             }
             steps{
-                run_with_ssh_agent("./BIBE_createSnapshot.sh \'${imageMaster}\' \'${commentHelper}\' \'${KM}\'")
+                jenkinsOps.runDeploymentShell("./BIBE_createSnapshot.sh \'${imageMaster}\' \'${commentHelper}\' \'${KM}\'")
             }
         }
 
@@ -248,12 +247,12 @@ pipeline {
                     stageParamsMap.each { key, value ->
                         def branches = [:]
                         branches[key] = {
-                        stage(key, params["env_$key"]  == 'enable' && params.DEPLOY_LATEST_SNAPSHOT, {
+                        jenkinsOps.conditionalStage(key, params["env_$key"]  == 'enable' && params.DEPLOY_LATEST_SNAPSHOT, {
                             catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
                                 if (params.kernel_update) {
-                                    run_with_ssh_agent("./BIBE_check_PE_SERVER_Version.sh \'${imageMaster}\'  \'${key}\'")
+                                    jenkinsOps.runDeploymentShell("./BIBE_check_PE_SERVER_Version.sh \'${imageMaster}\'  \'${key}\'")
                                 }
-                                run_with_ssh_agent("./BIBE_deploy_LatestAMI_withJenkins.sh \'${imageMaster}\' \'${key}\'")
+                                jenkinsOps.runDeploymentShell("./BIBE_deploy_LatestAMI_withJenkins.sh \'${imageMaster}\' \'${key}\'")
                             }
                         }) }
                         parallel branches
@@ -266,7 +265,7 @@ pipeline {
             steps {
                 script {
                     stageParamsMap.each { key, value ->
-                        stage(key, params["env_$key"]  == 'enable' && params.DEPLOY_LATEST_SNAPSHOT, {
+                        jenkinsOps.conditionalStage(key, params["env_$key"]  == 'enable' && params.DEPLOY_LATEST_SNAPSHOT, {
                             sh "aws cloudformation wait stack-update-complete --stack-name nvs-psx${key}-bibe"
                             sh """
                                 if [ `aws cloudformation describe-stack-events --stack-name nvs-psx${key}-bibe --max-items 1 --output text --query 'StackEvents[*].ResourceStatus' | grep 'UPDATE_COMPLETE'` = 'UPDATE_COMPLETE' ]
@@ -296,7 +295,7 @@ pipeline {
                         }
                     }
                     catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                        run_with_ssh_agent("./compare_bibe_tpo.sh P ${DESC}")
+                        jenkinsOps.runDeploymentShell("./compare_bibe_tpo.sh P ${DESC}")
                     }
                 }
             }
@@ -333,19 +332,4 @@ pipeline {
             }
         }
     }
-}
-
-def run_with_ssh_agent(shell_code) {
-    jenkinsOps.withDeploymentScripts {
-        jenkinsOps.withSshAgent {
-            sh script: shell_code
-        }
-    }
-}
-
-def stage(name, execute, block) {
-    return stage(name, execute ? block : {
-        echo 'Stage "' + name + '" skipped due to when conditional.'
-        Utils.markStageSkippedForConditional(STAGE_NAME)
-    })
 }

@@ -58,7 +58,7 @@ pipeline {
                             env.DESC="${env.DESC} $key"
                         }
                     }
-                    run_with_ssh_agent("./compare_bibe_tpo.sh A ${DESC}")
+                    jenkinsOps.runDeploymentShell("./compare_bibe_tpo.sh A ${DESC}")
                 }
             }
         }
@@ -67,7 +67,7 @@ pipeline {
     post {
         always {
             script {
-                currentBuild.description = "\n\nRELEASE CONFIGURATION:\n\n" + readConfigfile()
+                currentBuild.description = "\n\nRELEASE CONFIGURATION:\n\n" + jenkinsOps.readConfigFile()
                 def buildUser = "unknown"
                 wrap([$class: 'BuildUser']) {
                     try {
@@ -110,25 +110,4 @@ pipeline {
             }
         }
     }
-}
-
-def readConfigfile() {
-    String response = sh( script: "cat /var/jenkins_home/jenkinsDateneinsatzConfig/Configuration.groovy", returnStdout: true)
-    return response
-
-}
-
-def run_with_ssh_agent(shell_code) {
-    jenkinsOps.withDeploymentScripts {
-        jenkinsOps.withSshAgent {
-            sh script: shell_code
-        }
-    }
-}
-
-def stage(name, execute, block) {
-    return stage(name, execute ? block : {
-        echo 'Stage "' + name + '" skipped due to when conditional.'
-        Utils.markStageSkippedForConditional(STAGE_NAME)
-    })
 }

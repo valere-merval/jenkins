@@ -1,6 +1,5 @@
 #!groovy
 @Library('jenkins') _
-import org.jenkinsci.plugins.pipeline.modeldefinition.Utils
 def stageParamsMap = [
     h: [  ],
     i: [  ],
@@ -122,9 +121,9 @@ pipeline {
             steps {
                 script {
                     stageParamsMap.each { key, value ->
-                        stage("$key", params["env_$key"]  == 'enable' && params.UPDATE_KM_VERSION, {
+                        jenkinsOps.conditionalStage("$key", params["env_$key"]  == 'enable' && params.UPDATE_KM_VERSION, {
                             catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                                run_with_ssh_agent("./TPO_updateVersion_S3.sh \'SW;${RELEASE};${KM_VERSION};\' \'${key}\'")
+                                jenkinsOps.runDeploymentShell("./TPO_updateVersion_S3.sh \'SW;${RELEASE};${KM_VERSION};\' \'${key}\'")
                             }
                         })
                     }
@@ -137,8 +136,8 @@ pipeline {
                 script {
                     def branches = [:]
                     stageParamsMap.each { key, value ->
-                        branches["$key"] = { stage("$key", params["env_$key"]  == 'enable' && params.DIRECT_SW_INSTALL, {
-                            run_with_ssh_agent("./TPO_installSW.sh \'${key}\'")
+                        branches["$key"] = { jenkinsOps.conditionalStage("$key", params["env_$key"]  == 'enable' && params.DIRECT_SW_INSTALL, {
+                            jenkinsOps.runDeploymentShell("./TPO_installSW.sh \'${key}\'")
                         })}
                     }
                     parallel branches
@@ -152,10 +151,10 @@ pipeline {
                     def stageSucceeded = false
                     def amiUpdateList = []
                     stageParamsMap.each { key, value ->
-                        stage("$key", params["env_$key"]  == 'enable' && params.DEPLOY_NEW_BASE_IMAGE_AL2023, {
+                        jenkinsOps.conditionalStage("$key", params["env_$key"]  == 'enable' && params.DEPLOY_NEW_BASE_IMAGE_AL2023, {
                             catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                                 try {
-                                    run_with_ssh_agent("./TPO_deploy_LatestBI_withJenkins_al23.sh \'${key}\'")
+                                    jenkinsOps.runDeploymentShell("./TPO_deploy_LatestBI_withJenkins_al23.sh \'${key}\'")
                                     // addInfoBadge(text: "Latest base AMI deployed")
                                     amiUpdateList.add(key.toString().concat(" -> AMI deployed"));
                                     stageSucceeded = true
@@ -177,7 +176,7 @@ pipeline {
             steps {
                 script {
                     stageParamsMap.each { key, value ->
-                        stage("$key", params["env_$key"]  == 'enable' && (params.DEPLOY_NEW_BASE_IMAGE_AL2023), {
+                        jenkinsOps.conditionalStage("$key", params["env_$key"]  == 'enable' && (params.DEPLOY_NEW_BASE_IMAGE_AL2023), {
                             sh "aws cloudformation wait stack-update-complete --stack-name tpo-psx${key}-appsrv"
                             sh """
                                 if [ `aws cloudformation describe-stack-events --stack-name tpo-psx${key}-appsrv --max-items 1 --output text --query 'StackEvents[*].ResourceStatus' | grep 'UPDATE_COMPLETE'` = 'UPDATE_COMPLETE' ]
@@ -207,7 +206,7 @@ pipeline {
                         }
                     }
                     catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                        run_with_ssh_agent("./compare_bibe_tpo.sh P ${DESC}")
+                        jenkinsOps.runDeploymentShell("./compare_bibe_tpo.sh P ${DESC}")
                     }
                 }
             }
@@ -241,19 +240,4 @@ pipeline {
             }
         }
     }
-}
-
-def run_with_ssh_agent(shell_code) {
-    jenkinsOps.withDeploymentScripts {
-        jenkinsOps.withSshAgent {
-            sh script: shell_code
-        }
-    }
-}
-
-def stage(name, execute, block) {
-    return stage(name, execute ? block : {
-        echo 'Stage "' + name + '" skipped due to when conditional.'
-        Utils.markStageSkippedForConditional(STAGE_NAME)
-    })
 }
