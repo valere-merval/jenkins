@@ -31,12 +31,12 @@ def bibeTpoParameters(Map stageParamsMap = psxStageParams()) {
     ]
 
     def relDatenMap = [
-        nvs_abo_verbund: [ folder: 'nvs-abo-verbund', prefix: 'VERB', filter_prefix: 'ABOVERB', reference: '""', drop: 0 ],
-        tpo_verbund: [ folder: 'nvs-abo-verbund', prefix: 'VERB', filter_prefix: 'TPOVERB',  reference: 'nvs_abo_verbund', drop: 7  ],
-        LTBW:  [ folder: 'LTBW', prefix: 'LTBW', filter_prefix: 'LTBW', reference: '""', drop: 0 ],
-        LTBW_ABO:  [ folder: 'LTBW-ABO', prefix: 'LTBW', filter_prefix: 'LTBW-ABO', reference: 'LTBW', drop: 4 ],
-        LTN:  [ folder: 'LTN', prefix: 'LTN', filter_prefix: 'LTN', reference: '""', drop: 0 ],
-        TWE:  [ folder: 'TWE', prefix: 'TWE', filter_prefix: 'TWE', reference: '""', drop: 0 ],
+        nvs_abo_verbund: [ folder: 'nvs-abo-verbund', prefix: 'VERB', filter_prefix: 'ABOVERB', reference: '', referenceExpression: '""', drop: 0 ],
+        tpo_verbund: [ folder: 'nvs-abo-verbund', prefix: 'VERB', filter_prefix: 'TPOVERB',  reference: 'nvs_abo_verbund', referenceExpression: 'nvs_abo_verbund', drop: 7  ],
+        LTBW:  [ folder: 'LTBW', prefix: 'LTBW', filter_prefix: 'LTBW', reference: '', referenceExpression: '""', drop: 0 ],
+        LTBW_ABO:  [ folder: 'LTBW-ABO', prefix: 'LTBW', filter_prefix: 'LTBW-ABO', reference: 'LTBW', referenceExpression: 'LTBW', drop: 4 ],
+        LTN:  [ folder: 'LTN', prefix: 'LTN', filter_prefix: 'LTN', reference: '', referenceExpression: '""', drop: 0 ],
+        TWE:  [ folder: 'TWE', prefix: 'TWE', filter_prefix: 'TWE', reference: '', referenceExpression: '""', drop: 0 ],
     ]
 
     def customParamList = [
@@ -45,7 +45,7 @@ def bibeTpoParameters(Map stageParamsMap = psxStageParams()) {
             choiceType: 'PT_SINGLE_SELECT',
             description: 'Datenfiltern und eingeschaltete Umgebungen (default) werden entsprechend aktualisiert',
             name: 'RELEASE',
-            script: [$class: 'GroovyScript', fallbackScript: [classpath: [], sandbox: false, script: ''],
+            script: [$class: 'GroovyScript', fallbackScript: [classpath: [], sandbox: false, script: 'return []'],
             script: [classpath: [], sandbox: false, script: '''
                 def result = []
                 new File( "/var/jenkins_home/jenkinsDateneinsatzConfig/generated/RELEASE" ).eachLine { line ->
@@ -57,12 +57,14 @@ def bibeTpoParameters(Map stageParamsMap = psxStageParams()) {
     ]
 
     relDatenMap.each { key, value ->
+        def referencedParameters = ['RELEASE', value.reference].findAll { it }.join(',')
+        def referenceExpression = value.referenceExpression ?: value.reference
         customParamList.add([$class: 'CascadeChoiceParameter',
             choiceType: 'PT_SINGLE_SELECT',
             description: '',
             name: key,
-            referencedParameters: "RELEASE,${value.reference}",
-            script: [$class: 'GroovyScript', fallbackScript: [classpath: [], sandbox: false, script: ''],
+            referencedParameters: referencedParameters,
+            script: [$class: 'GroovyScript', fallbackScript: [classpath: [], sandbox: false, script: "return ['FALLBACK_${key}']"],
             script: [classpath: [], sandbox: false, script: """
                 def filter = "${value.filter_prefix}"
                 def rel_ALTERNATIVE = new File( "/var/jenkins_home/jenkinsDateneinsatzConfig/generated/RELEASE_ALTERNATIVE" ).text.trim()
@@ -83,8 +85,8 @@ def bibeTpoParameters(Map stageParamsMap = psxStageParams()) {
                     result.subList(9, result.size()).clear()
                 }
                 result.add(0,'')
-                if (${value.reference} != '') {
-                    def expectedPrefix="${value.filter_prefix}"+${value.reference}.drop(${value.drop}).reverse().drop(6).reverse()
+                if (${referenceExpression} != '') {
+                    def expectedPrefix="${value.filter_prefix}"+${referenceExpression}.drop(${value.drop}).reverse().drop(6).reverse()
                     result.indexed().each { i,v ->
                         if(v.toString().startsWith(expectedPrefix)) {
                                 result.add(0,v.toString())
