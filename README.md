@@ -61,6 +61,9 @@ jenkinsOps.withPman { ... }
 jenkinsOps.withUpdateStack { ... }
 jenkinsOps.triggerJob('job-name', [FLAG: true], [wait: true])
 jsDataDeployment.bibeTpoParameters()
+jsSoftwareDeployment.bibeParameters(stageParamsMap)
+jsEnvironmentControl.prepareConfigurationFiles(stageParamsMap, params, parentDir, configPath)
+jsConfigurationGroovy.applyConfiguration(configurationMap, configPath)
 ```
 
 ## Dokumentation
