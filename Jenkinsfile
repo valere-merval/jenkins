@@ -44,6 +44,23 @@ pipeline {
                 '''
             }
         }
+        stage('Validate shared library layering') {
+            steps {
+                sh '''
+                    test -f src/org/jenkins/pipeline/AbstractPipelineScript.groovy
+                    test -f src/org/jenkins/pipeline/AwsSupport.groovy
+                    test -f src/org/jenkins/pipeline/ConfigFileSupport.groovy
+                    test -f src/org/jenkins/pipeline/ConfigurationGroovySupport.groovy
+                    test -f src/org/jenkins/pipeline/JenkinsOpsSupport.groovy
+                    test -f src/org/jenkins/pipeline/DataDeploymentSupport.groovy
+                    test -f src/org/jenkins/pipeline/DeploymentSupport.groovy
+                    test -f src/org/jenkins/pipeline/EnvironmentControlSupport.groovy
+                    test -f src/org/jenkins/pipeline/QualitySupport.groovy
+                    test -f src/org/jenkins/pipeline/SoftwareDeploymentSupport.groovy
+                    awk 'FNR > 40 { print FILENAME " has too much logic for vars/ (" FNR " lines)"; bad = 1 } END { exit bad }' vars/*.groovy
+                '''
+            }
+        }
         stage('Validate V2 pipelines') {
             steps {
                 sh '''

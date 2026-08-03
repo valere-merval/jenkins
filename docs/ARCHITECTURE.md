@@ -10,7 +10,7 @@ Das Refactoring ist ein Big-Bang-Refactoring im Repository: Die echten Implement
 
 ```text
 jenkins/
-├── vars/                         # Jenkins Shared Library Global Variables / Steps
+├── vars/                         # Schlanke Jenkins Shared Library Global Variables / Steps
 ├── src/org/jenkins/               # Groovy-Klassen, Konstanten, wiederverwendbare Logik
 ├── resources/org/jenkins/         # Ressourcen der Shared Library
 ├── pipelines/v2/deployment/       # Neue Deployment-Zielpipelines mit @Library('jenkins')
@@ -37,15 +37,17 @@ Die Shared Library bildet die Plattformschicht für alle V2-Pipelines.
 
 Wichtige Dateien:
 
-- `vars/jenkinsOps.groovy`: zentrale Pipeline-Fassade für Agent, Credentials, Arbeitsverzeichnisse und Jenkins-Helfer.
-- `vars/jsDeployment.groovy`: fachliche Deployment-Helfer.
-- `vars/jsDataDeployment.groovy`: umfangreiche Active-Choices-Parameter und PMAN-Datenstrukturen für Dateneinsatz-Pipelines.
-- `vars/jsSoftwareDeployment.groovy`: BIBE/TPO-Software-Deployment-Parameter und Stage-Orchestrierung.
-- `vars/jsEnvironmentControl.groovy`: Ein-/Ausschalten von PSX-Umgebungen und AMI/Stack-Update-Orchestrierung.
-- `vars/jsConfigurationGroovy.groovy`: Pflege der `Configuration.groovy` inklusive Backup, Parsing und Generierung.
-- `vars/jsConfigFile.groovy`: wiederverwendbare Datei-/Config-Manipulationen und Stack-Parameter-Lookups.
-- `vars/jsAws.groovy`: AWS-Helfer.
-- `vars/jsQuality.groovy`: Validierungs-Helfer.
+- `vars/*.groovy`: kurze globale Jenkins-Fassaden, die keine fachliche Implementierung halten.
+- `src/org/jenkins/pipeline/AbstractPipelineScript.groovy`: gemeinsame abstrakte Basis für `src`-Klassen, die Jenkins Pipeline Steps benötigen.
+- `src/org/jenkins/pipeline/JenkinsOpsSupport.groovy`: Agent, Credentials, Arbeitsverzeichnisse und Jenkins-Helfer.
+- `src/org/jenkins/pipeline/DataDeploymentSupport.groovy`: Active-Choices-Parameter und PMAN-Datenstrukturen für Dateneinsatz-Pipelines.
+- `src/org/jenkins/pipeline/SoftwareDeploymentSupport.groovy`: BIBE/TPO-Software-Deployment-Parameter und Stage-Orchestrierung.
+- `src/org/jenkins/pipeline/EnvironmentControlSupport.groovy`: Ein-/Ausschalten von PSX-Umgebungen und AMI/Stack-Update-Orchestrierung.
+- `src/org/jenkins/pipeline/ConfigurationGroovySupport.groovy`: Pflege der `Configuration.groovy` inklusive Backup, Parsing und Generierung.
+- `src/org/jenkins/pipeline/ConfigFileSupport.groovy`: wiederverwendbare Datei-/Config-Manipulationen und Stack-Parameter-Lookups.
+- `src/org/jenkins/pipeline/DeploymentSupport.groovy`: kleine fachliche Deployment-Helfer.
+- `src/org/jenkins/pipeline/AwsSupport.groovy`: AWS-Helfer.
+- `src/org/jenkins/pipeline/QualitySupport.groovy`: Validierungs-Helfer.
 - `src/org/jenkins/Defaults.groovy`: zentrale Konstanten.
 - `resources/org/jenkins/pipeline-catalog.yml`: deklarativer Pipeline-Katalog.
 
@@ -126,6 +128,7 @@ Dort liegen nur Artefakte, die nicht aktiv benötigt werden, z. B. ehemalige `_o
 - kanonische neue Pfade,
 - vollständige V2-Abdeckung aller Legacy-Jenkinsfiles,
 - keine Legacy-Delegationswrapper in V2,
+- schlanke `vars/`-Fassaden mit Implementierung in `src/`,
 - dass keine Symlinks mehr im Repository liegen,
 - Whitespace-Fehler im Git-Diff.
 

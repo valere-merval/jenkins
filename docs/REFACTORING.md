@@ -136,10 +136,14 @@ src/
 resources/
 ```
 
-Zentrale Fassade:
+`vars/` ist nur noch die Jenkins-kompatible Einstiegsschicht. Wiederverwendbare Pipeline-Implementierungen liegen in `src/org/jenkins/pipeline/` und teilen sich `AbstractPipelineScript`, damit Pipeline Steps aus Klassen heraus genutzt werden können.
+
+Zentrale Fassaden:
 
 ```text
 vars/jenkinsOps.groovy
+vars/jsSoftwareDeployment.groovy
+vars/jsDataDeployment.groovy
 ```
 
 Namespace:

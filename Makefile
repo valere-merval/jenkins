@@ -1,6 +1,6 @@
-.PHONY: validate validate-layout validate-canonical-paths validate-v2 validate-trailing-space docs-list
+.PHONY: validate validate-layout validate-canonical-paths validate-shared-library validate-v2 validate-trailing-space docs-list
 
-validate: validate-layout validate-canonical-paths validate-v2 validate-trailing-space
+validate: validate-layout validate-canonical-paths validate-shared-library validate-v2 validate-trailing-space
 	@echo "Repository validation passed."
 
 validate-layout:
@@ -39,6 +39,20 @@ validate-canonical-paths:
 	@test -f scripts/ops/create-snapshot.py
 	@test -z "$$(find . -type l -print -quit)"
 	@echo "Canonical path validation passed."
+
+validate-shared-library:
+	@test -f src/org/jenkins/pipeline/AbstractPipelineScript.groovy
+	@test -f src/org/jenkins/pipeline/AwsSupport.groovy
+	@test -f src/org/jenkins/pipeline/ConfigFileSupport.groovy
+	@test -f src/org/jenkins/pipeline/ConfigurationGroovySupport.groovy
+	@test -f src/org/jenkins/pipeline/JenkinsOpsSupport.groovy
+	@test -f src/org/jenkins/pipeline/DataDeploymentSupport.groovy
+	@test -f src/org/jenkins/pipeline/DeploymentSupport.groovy
+	@test -f src/org/jenkins/pipeline/EnvironmentControlSupport.groovy
+	@test -f src/org/jenkins/pipeline/QualitySupport.groovy
+	@test -f src/org/jenkins/pipeline/SoftwareDeploymentSupport.groovy
+	@awk 'FNR > 40 { print FILENAME " has too much logic for vars/ (" FNR " lines)"; bad = 1 } END { exit bad }' vars/*.groovy
+	@echo "Shared-library layering validation passed."
 
 validate-v2:
 	@test "$$(find pipelines/legacy -type f | wc -l)" = "$$(find pipelines/v2 -type f | wc -l)"

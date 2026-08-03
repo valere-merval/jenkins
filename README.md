@@ -9,7 +9,7 @@ Die Implementierung ist vollständig in fachliche Zielbereiche verschoben. Alte 
 ## Zielstruktur
 
 ```text
-├── vars/                         # Jenkins Shared Library Steps
+├── vars/                         # Schlanke Jenkins Shared Library Fassaden
 ├── src/org/jenkins/               # Groovy-Klassen, Konstanten und wiederverwendbare Logik
 ├── resources/org/jenkins/         # Shared-Library-Ressourcen, z. B. Pipeline-Katalog
 ├── pipelines/v2/                  # Neue, ausführbare Ziel-Pipelines mit @Library('jenkins')
@@ -51,7 +51,9 @@ Verwendung:
 @Library('jenkins') _
 ```
 
-Zentrale Fassade:
+`vars/` enthält nur noch kurze globale Jenkins-Fassaden. Die wiederverwendbare Logik liegt in `src/org/jenkins/pipeline/` und wird dort über gemeinsame Basisklassen gekapselt.
+
+Zentrale Fassaden:
 
 ```groovy
 jenkinsOps.defaultAgentLabel()
@@ -84,6 +86,7 @@ Die Validierung prüft:
 - kanonische V2- und Legacy-Pfade,
 - vollständige V2-Abdeckung für alle Legacy-Jenkinsfiles,
 - dass V2 keine Legacy-Delegationswrapper mehr enthält,
+- dass `vars/` schlank bleibt und Pipeline-Logik in `src/` liegt,
 - dass keine Symlinks mehr im Repository liegen,
 - Whitespace-Probleme im Git-Diff.
 
