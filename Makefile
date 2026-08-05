@@ -1,4 +1,4 @@
-.PHONY: validate validate-layout validate-canonical-paths validate-shared-library validate-v2 validate-trailing-space docs-list
+.PHONY: validate validate-layout validate-canonical-paths validate-shared-library validate-v2 validate-trailing-space smoke docs-list
 
 validate: validate-layout validate-canonical-paths validate-shared-library validate-v2 validate-trailing-space
 	@echo "Repository validation passed."
@@ -68,6 +68,10 @@ validate-v2:
 validate-trailing-space:
 	@git diff --check
 	@echo "Whitespace validation passed."
+
+smoke:
+	@command -v groovy >/dev/null 2>&1 || { echo "groovy CLI not found; skipping local smoke test"; exit 0; }
+	@groovy -cp "src:test/smoke/stubs" test/smoke/LibraryLoadSpec.groovy
 
 docs-list:
 	@find docs -maxdepth 1 -type f | sort
