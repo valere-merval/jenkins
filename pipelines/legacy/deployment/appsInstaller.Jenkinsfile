@@ -26,7 +26,7 @@ pipeline {
                         // runCommand(app, 's')
                         // start app
                         // runCommand(app, 't')
-                        dir("scripts/deployment") {
+                        dir("infrastructure/helpers/deployment") {
                             sshagent(['7f075ad2-e78f-429d-8713-4a6acd5f7dc2']) {
                                 sh "./asi.sh -p -a \'${app}\'"
                                 sh "./asi.sh -d -a \'${app}\'"
@@ -66,7 +66,7 @@ def runCommand(app, command) {
                 action = 'undef'
         }
         if (action != 'undef') {
-            dir("scripts/deployment") {
+            dir("infrastructure/helpers/deployment") {
                 // sshagent(['7f075ad2-e78f-429d-8713-4a6acd5f7dc2']) {
                     println "app=" + ${app} + "; action=[" + ${action} + "];"
                     sh "./asi.sh -\'${command}\' -a \'${app}\'"

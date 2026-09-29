@@ -12,7 +12,7 @@ pipeline {
             steps {
                 script {
 
-                    def filePath = "scripts/deployment/latest-ami.info"
+                    def filePath = "infrastructure/helpers/deployment/latest-ami.info"
                     def currentBaseAmi = ""
                     def latestBaseAmi = ""
 

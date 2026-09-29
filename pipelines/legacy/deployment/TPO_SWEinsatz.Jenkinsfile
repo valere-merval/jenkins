@@ -243,7 +243,7 @@ pipeline {
 }
 
 def run_with_ssh_agent(shell_code) {
-    dir("scripts/deployment") {
+    dir("infrastructure/helpers/deployment") {
         sshagent(['7f075ad2-e78f-429d-8713-4a6acd5f7dc2']) {
             sh script: shell_code
         }

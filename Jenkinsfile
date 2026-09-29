@@ -12,10 +12,10 @@ pipeline {
                     test -d pipelines/v2/configuration
                     test -d pipelines/legacy/deployment
                     test -d pipelines/legacy/configuration
-                    test -d scripts/deployment
-                    test -d scripts/ops
+                    test -d infrastructure/helpers/deployment
+                    test -d infrastructure/helpers/ops
                     test -d infrastructure/ansible
-                    test -d data/pman
+                    test -d config/pman
                     test -d config/update-stack
                     test -d legacy/obsolete
                     test -f docs/ARCHITECTURE.md
@@ -34,12 +34,12 @@ pipeline {
                     test -f pipelines/legacy/deployment/BIBE_SWEinsatz.Jenkinsfile
                     test -f pipelines/legacy/deployment/BIBE_TPO_DataDeployment.Jenkinsfile
                     test -f pipelines/legacy/deployment/TPO_SWEinsatz.Jenkinsfile
-                    test -f scripts/deployment/BIBE_createSnapshot.sh
+                    test -f infrastructure/helpers/deployment/BIBE_createSnapshot.sh
                     test -f pipelines/legacy/configuration/modifyConfigurationGroovy.Jenkinsfile
                     test -f infrastructure/ansible/local.yml
-                    test -f data/pman/pman.py
+                    test -f infrastructure/helpers/python/pman.py
                     test -f config/update-stack/update-stack.py
-                    test -f scripts/ops/create-snapshot.py
+                    test -f infrastructure/helpers/python/create-snapshot.py
                     test -z "$(find . -type l -print -quit)"
                 '''
             }
@@ -71,7 +71,7 @@ pipeline {
                     rm -f /tmp/jenkins-legacy-files.$$ /tmp/jenkins-v2-files.$$
                     grep -R "@Library('jenkins') _" pipelines/v2 >/dev/null
                     ! grep -R "Delegate to legacy\|triggerJob('BIBE_SWDeployment\|triggerJob('DataDeployment\|triggerJob('TPO_SWDeployment\|triggerJob('onOffEnvinroment" pipelines/v2
-                    ! grep -R "sshagent(\|7f075ad2\|dir(\"scripts/deployment\")\|dir(\"data/pman\")\|dir(\"config/update-stack\")" pipelines/v2
+                    ! grep -R "sshagent(\|7f075ad2\|dir(\"infrastructure/helpers/deployment\")\|dir(\"config/pman\")\|dir(\"config/update-stack\")" pipelines/v2
                 '''
             }
         }

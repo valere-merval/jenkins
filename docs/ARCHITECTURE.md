@@ -17,10 +17,11 @@ jenkins/
 ├── pipelines/v2/configuration/    # Neue Konfigurations-Zielpipelines mit @Library('jenkins')
 ├── pipelines/legacy/deployment/   # Migrierte Legacy-Deployment-Jenkinsfiles als Referenz/Fallback
 ├── pipelines/legacy/configuration/# Migrierte Legacy-Konfigurations-Jenkinsfiles als Referenz/Fallback
-├── scripts/deployment/            # Reale Deployment-Shell-Skripte und Hilfsdateien
-├── scripts/ops/                   # Reale Operations-Skripte aus dem ehemaligen Root
+├── infrastructure/helpers/deployment/            # Reale Deployment-Shell-Skripte und Hilfsdateien
+├── infrastructure/helpers/ops/                   # Reale Operations-Skripte aus dem ehemaligen Root
+├── infrastructure/helpers/python/                # Reale Python-Hilfsskripte
 ├── infrastructure/ansible/        # Reale Ansible-Struktur
-├── data/pman/                     # Reale PMAN-Struktur
+├── config/pman/                     # Reale PMAN-Struktur
 ├── config/update-stack/           # Reale Stack-/Umgebungskonfigurationen
 ├── config/*.groovy                # Jenkins-Konfigurationsgeneratoren und Beispiele
 ├── legacy/obsolete/               # Archivierte, obsolete Artefakte
@@ -61,14 +62,14 @@ Wichtige Dateien:
 
 ### 4. Operative Skripte
 
-`scripts/deployment/` enthält die früheren Deployment-Skripte aus `deployment/`.
+`infrastructure/helpers/deployment/` enthält die früheren Deployment-Skripte aus `deployment/`.
 
-`scripts/ops/` enthält frühere Root-Skripte wie Checks, Snapshot- und Terminate-Helper.
+`infrastructure/helpers/ops/` enthält frühere Root-Skripte wie Checks, Snapshot- und Terminate-Helper.
 
 ### 5. Infrastruktur, Daten und Konfiguration
 
 - `infrastructure/ansible/`: Ansible.
-- `data/pman/`: PMAN-Konfigurationen.
+- `config/pman/`: PMAN-Konfigurationen.
 - `config/update-stack/`: Stack-Konfiguration.
 - `config/*.groovy`: Jenkins-Konfigurationsgeneratoren und Beispiele.
 
@@ -83,10 +84,10 @@ pipelines/v2/deployment/BIBE_SWEinsatz.Jenkinsfile
 pipelines/v2/deployment/TPO_SWEinsatz.Jenkinsfile
 pipelines/v2/deployment/BIBE_TPO_DataDeployment.Jenkinsfile
 pipelines/v2/configuration/modifyConfigurationGroovy.Jenkinsfile
-scripts/deployment/BIBE_createSnapshot.sh
-scripts/ops/create-snapshot.py
+infrastructure/helpers/deployment/BIBE_createSnapshot.sh
+infrastructure/helpers/python/create-snapshot.py
 infrastructure/ansible/
-data/pman/
+config/pman/
 config/update-stack/
 ```
 
@@ -105,7 +106,7 @@ pipelines/v2/deployment/BIBE_SWEinsatz.Jenkinsfile
     ↓
 jenkinsOps.withDeploymentScripts / withSshAgent / withPman / withUpdateStack
     ↓
-scripts/deployment/ oder scripts/ops/
+infrastructure/helpers/deployment/ oder infrastructure/helpers/ops/
     ↓
 BIBE / TPO / PSX / AWS / Ansible / PMAN
 ```

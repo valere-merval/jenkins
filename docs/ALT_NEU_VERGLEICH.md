@@ -12,10 +12,10 @@ Die alte Architektur war ein historisch gewachsenes Skript-Repository. Die neue 
 | Jenkinsfiles | Direkt in `deployment/` und `configuration/` | Vollständige V2-Zielpipelines in `pipelines/v2/`, Legacy-Referenz in `pipelines/legacy/` |
 | Neue Pipelines | Nicht vorhanden | `pipelines/v2/deployment/` und `pipelines/v2/configuration/` |
 | Shared Library | Nicht vorhanden | `vars/`, `src/org/jenkins/`, `resources/org/jenkins/` |
-| Deployment-Skripte | Gemischt mit Jenkinsfiles in `deployment/` | Reale Skripte in `scripts/deployment/` |
-| Root-Skripte | Direkt im Repository-Root | `scripts/ops/` |
+| Deployment-Skripte | Gemischt mit Jenkinsfiles in `deployment/` | Reale Skripte in `infrastructure/helpers/deployment/` |
+| Root-Skripte | Direkt im Repository-Root | `infrastructure/helpers/ops/` |
 | Ansible | `ansible-playbook/` im Root | `infrastructure/ansible/` |
-| PMAN | `pman/` im Root | `data/pman/` |
+| PMAN | `pman/` im Root | `config/pman/` |
 | Stack-Konfiguration | `update-stack/` im Root | `config/update-stack/` |
 | Jenkins-Konfiguration | `configuration/*.groovy` | `config/*.groovy` |
 | Obsolete Dateien | Zwischen aktiven Dateien | `legacy/obsolete/` |
@@ -57,10 +57,11 @@ jenkins/
 ├── pipelines/v2/configuration/
 ├── pipelines/legacy/deployment/
 ├── pipelines/legacy/configuration/
-├── scripts/deployment/
-├── scripts/ops/
+├── infrastructure/helpers/deployment/
+├── infrastructure/helpers/ops/
+├── infrastructure/helpers/python/
 ├── infrastructure/ansible/
-├── data/pman/
+├── config/pman/
 ├── config/update-stack/
 ├── config/*.groovy
 ├── legacy/obsolete/
@@ -105,7 +106,7 @@ Nachher:
 
 ```text
 pipelines/v2/deployment/BIBE_SWEinsatz.Jenkinsfile
-scripts/deployment/BIBE_PE_S3Sync.sh
+infrastructure/helpers/deployment/BIBE_PE_S3Sync.sh
 ```
 
 Referenz/Fallback:

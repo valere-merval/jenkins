@@ -5,7 +5,7 @@ import org.jenkinsci.plugins.pipeline.modeldefinition.Utils
 // ------------------------------------------------------------------
 // /var/jenkins_home/jenkinsDateneinsatzConfig/Configuration.groovy
 // /var/jenkins_home/jenkinsDateneinsatzConfig/generated/*
-// pman.py
+// infrastructure/helpers/python/pman.py
 // terminate_psx_bibe.sh
 // datenEinsatz_resetBIBE_with_playbook.sh
 // terminate_psx_tpo.sh
@@ -364,7 +364,7 @@ pipeline {
                     stageParamsMap.each { key, value ->
                         branches[key] = { stage("$key", params["env_$key"]  == 'enable' && params.pman, {
                             catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                                dir("data/pman") {
+                                dir("config/pman") {
                                 pmanDatenMap.each { dataSet, dataTypes ->
                                     def firstDataTypesEntryValue = dataTypes.entrySet().iterator().next().value
                                     if (firstDataTypesEntryValue != '') {
@@ -372,14 +372,14 @@ pipeline {
                                         dataTypes.each { dataType, data ->
                                             dataType = specialCases(dataType)
                                                 if (data == 'latest' && data != firstDataTypesEntryValue) {
-                                                    // echo "./pman.py --datatype \'${dataType}\' --latest \'${firstDataTypesEntryValue}${key}.yml\'"
-                                                    sh "./pman.py --datatype \'${dataType}\' --latest \'${firstDataTypesEntryValue}${key}.yml\'"
+                                                    // echo "../../infrastructure/helpers/python/pman.py --datatype \'${dataType}\' --latest \'${firstDataTypesEntryValue}${key}.yml\'"
+                                                    sh "../../infrastructure/helpers/python/pman.py --datatype \'${dataType}\' --latest \'${firstDataTypesEntryValue}${key}.yml\'"
                                                     sleep 1
                                                 } else if (data != '' && data != firstDataTypesEntryValue) {
-                                                    // echo "./pman.py --datatype \'${dataType}\' --pkgname \'${data}\' \'${firstDataTypesEntryValue}${key}.yml\'"
-                                                    sh "./pman.py --datatype \'${dataType}\' --pkgname \'${data}\' \'${firstDataTypesEntryValue}${key}.yml\'"
+                                                    // echo "../../infrastructure/helpers/python/pman.py --datatype \'${dataType}\' --pkgname \'${data}\' \'${firstDataTypesEntryValue}${key}.yml\'"
+                                                    sh "../../infrastructure/helpers/python/pman.py --datatype \'${dataType}\' --pkgname \'${data}\' \'${firstDataTypesEntryValue}${key}.yml\'"
                                                     sleep 1
-                                                    // // ./pman.py --datatype connection-preview --pkgname 123_001_bibe_Plandaten_J25.zip hafaspools-auskunft-tst.yml
+                                                    // // ../../infrastructure/helpers/python/pman.py --datatype connection-preview --pkgname 123_001_bibe_Plandaten_J25.zip hafaspools-auskunft-tst.yml
                                                 }
                                             }
                                         }
@@ -539,7 +539,7 @@ pipeline {
 }
 
 def run_with_ssh_agent(shell_code) {
-    dir("scripts/deployment") {
+    dir("infrastructure/helpers/deployment") {
         sshagent(['7f075ad2-e78f-429d-8713-4a6acd5f7dc2']) {
             sh script: shell_code
         }

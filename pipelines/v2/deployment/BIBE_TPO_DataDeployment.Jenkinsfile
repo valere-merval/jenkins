@@ -5,7 +5,7 @@
 // ------------------------------------------------------------------
 // /var/jenkins_home/jenkinsDateneinsatzConfig/Configuration.groovy
 // /var/jenkins_home/jenkinsDateneinsatzConfig/generated/*
-// pman.py
+// infrastructure/helpers/python/pman.py
 // terminate_psx_bibe.sh
 // datenEinsatz_resetBIBE_with_playbook.sh
 // terminate_psx_tpo.sh
@@ -72,14 +72,14 @@ pipeline {
                                         dataTypes.each { dataType, data ->
                                             dataType = jenkinsOps.dataTypeName(dataType)
                                                 if (data == 'latest' && data != firstDataTypesEntryValue) {
-                                                    // echo "./pman.py --datatype \'${dataType}\' --latest \'${firstDataTypesEntryValue}${key}.yml\'"
-                                                    sh "./pman.py --datatype \'${dataType}\' --latest \'${firstDataTypesEntryValue}${key}.yml\'"
+                                                    // echo "../../infrastructure/helpers/python/pman.py --datatype \'${dataType}\' --latest \'${firstDataTypesEntryValue}${key}.yml\'"
+                                                    sh "../../infrastructure/helpers/python/pman.py --datatype \'${dataType}\' --latest \'${firstDataTypesEntryValue}${key}.yml\'"
                                                     sleep 1
                                                 } else if (data != '' && data != firstDataTypesEntryValue) {
-                                                    // echo "./pman.py --datatype \'${dataType}\' --pkgname \'${data}\' \'${firstDataTypesEntryValue}${key}.yml\'"
-                                                    sh "./pman.py --datatype \'${dataType}\' --pkgname \'${data}\' \'${firstDataTypesEntryValue}${key}.yml\'"
+                                                    // echo "../../infrastructure/helpers/python/pman.py --datatype \'${dataType}\' --pkgname \'${data}\' \'${firstDataTypesEntryValue}${key}.yml\'"
+                                                    sh "../../infrastructure/helpers/python/pman.py --datatype \'${dataType}\' --pkgname \'${data}\' \'${firstDataTypesEntryValue}${key}.yml\'"
                                                     sleep 1
-                                                    // // ./pman.py --datatype connection-preview --pkgname 123_001_bibe_Plandaten_J25.zip hafaspools-auskunft-tst.yml
+                                                    // // ../../infrastructure/helpers/python/pman.py --datatype connection-preview --pkgname 123_001_bibe_Plandaten_J25.zip hafaspools-auskunft-tst.yml
                                                 }
                                             }
                                         }

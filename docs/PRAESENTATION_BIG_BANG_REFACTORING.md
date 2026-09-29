@@ -78,10 +78,11 @@ jenkins/
 ├── pipelines/v2/configuration/     # neue ausführbare Konfigurations-Zielpipelines
 ├── pipelines/legacy/deployment/    # Legacy-Jenkinsfiles als Referenz/Fallback
 ├── pipelines/legacy/configuration/ # Legacy-Konfigurationspipelines als Referenz/Fallback
-├── scripts/deployment/             # reale Deployment-Shell-Skripte
-├── scripts/ops/                    # frühere Root-Operations-Skripte
+├── infrastructure/helpers/deployment/             # reale Deployment-Shell-Skripte
+├── infrastructure/helpers/ops/                    # frühere Root-Operations-Skripte
+├── infrastructure/helpers/python/                 # Python-Hilfsskripte
 ├── infrastructure/ansible/         # Ansible-Playbooks, Inventories, Rollen, Templates
-├── data/pman/                      # PMAN-Konfigurationen und Runner
+├── config/pman/                      # PMAN-Konfigurationen und Runner
 ├── config/update-stack/            # Stack-/Umgebungskonfigurationen
 ├── config/*.groovy                 # Jenkins-Konfigurationsgeneratoren und Beispiele
 ├── legacy/obsolete/                # eindeutig obsolete Artefakte
@@ -298,7 +299,7 @@ deployment/*.sh
 Nach:
 
 ```text
-scripts/deployment/
+infrastructure/helpers/deployment/
 ```
 
 ### Operations-Skripte
@@ -316,7 +317,7 @@ terminate_psx_tpo.sh
 Nach:
 
 ```text
-scripts/ops/
+infrastructure/helpers/ops/
 ```
 
 ### Infrastruktur und Daten
@@ -333,7 +334,7 @@ Nach:
 
 ```text
 infrastructure/ansible/
-data/pman/
+config/pman/
 config/update-stack/
 ```
 
@@ -350,7 +351,7 @@ pipelines/v2/deployment/BIBE_SWEinsatz.Jenkinsfile
     ↓
 vars/jenkinsOps.groovy / fachliche js*-Library
     ↓
-scripts/deployment/ oder config/update-stack/ oder data/pman/
+infrastructure/helpers/deployment/ oder config/update-stack/ oder config/pman/
     ↓
 BIBE / TPO / PSX / AWS / Ansible / PMAN
 ```
@@ -366,7 +367,7 @@ jsSoftwareDeployment.runBibe...
     ↓
 jenkinsOps.runDeploymentShell(...)
     ↓
-scripts/deployment/BIBE_*.sh
+infrastructure/helpers/deployment/BIBE_*.sh
 ```
 
 ### Beispiel: Umgebung ein-/ausschalten
@@ -425,8 +426,8 @@ Sinnvolle Zusatzchecks:
 ```bash
 git diff --check
 find . -type l
-bash -n scripts/deployment/*.sh
-python3 -m py_compile scripts/ops/*.py data/pman/*.py config/update-stack/*.py
+bash -n infrastructure/helpers/deployment/*.sh
+python3 -m py_compile infrastructure/helpers/python/*.py config/pman/*.py config/update-stack/*.py
 ```
 
 `find . -type l` soll keine aktiven Symlinks liefern.
@@ -580,10 +581,10 @@ update-stack/
 Stattdessen:
 
 ```text
-scripts/deployment/
+infrastructure/helpers/deployment/
 config/
 infrastructure/ansible/
-data/pman/
+config/pman/
 config/update-stack/
 ```
 
@@ -715,10 +716,10 @@ src/org/jenkins/
 resources/org/jenkins/
 pipelines/v2/
 pipelines/legacy/
-scripts/deployment/
-scripts/ops/
+infrastructure/helpers/deployment/
+infrastructure/helpers/ops/
 infrastructure/ansible/
-data/pman/
+config/pman/
 config/update-stack/
 legacy/obsolete/
 docs/

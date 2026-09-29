@@ -53,7 +53,7 @@ deployment/compare_bibe_tpo_info_*
 Nach:
 
 ```text
-scripts/deployment/
+infrastructure/helpers/deployment/
 ```
 
 Relative Aufrufe innerhalb der Skripte wurden auf `config/update-stack/` und `infrastructure/ansible/` angepasst.
@@ -75,7 +75,7 @@ uploglevel2st.sh
 Nach:
 
 ```text
-scripts/ops/
+infrastructure/helpers/ops/
 ```
 
 ### Infrastruktur und Daten
@@ -92,7 +92,7 @@ Nach:
 
 ```text
 infrastructure/ansible/
-data/pman/
+config/pman/
 config/update-stack/
 ```
 
@@ -121,7 +121,7 @@ Geändert wurde gezielt:
 - `@Library('jenkins') _` wird geladen.
 - `agent { label 'master' }` nutzt `jenkinsOps.defaultAgentLabel()`.
 - direkte `sshagent([...])`-Blöcke nutzen `jenkinsOps.withSshAgent`.
-- direkte Arbeitsverzeichnisse wie `scripts/deployment`, `data/pman` und `config/update-stack` nutzen `jenkinsOps.withDeploymentScripts`, `jenkinsOps.withPman` und `jenkinsOps.withUpdateStack`.
+- direkte Arbeitsverzeichnisse wie `infrastructure/helpers/deployment`, `config/pman` und `config/update-stack` nutzen `jenkinsOps.withDeploymentScripts`, `jenkinsOps.withPman` und `jenkinsOps.withUpdateStack`.
 - V2-Wrapper mit reiner Legacy-Delegation wurden entfernt.
 
 Legacy bleibt als Referenz/Fallback unter `pipelines/legacy/` erhalten.
@@ -178,10 +178,10 @@ pipelines/v2/configuration/modifyConfigurationGroovy.Jenkinsfile
 Beispiele für neue Datei-/Skriptpfade:
 
 ```text
-scripts/deployment/BIBE_createSnapshot.sh
-scripts/ops/create-snapshot.py
+infrastructure/helpers/deployment/BIBE_createSnapshot.sh
+infrastructure/helpers/python/create-snapshot.py
 infrastructure/ansible/
-data/pman/
+config/pman/
 config/update-stack/
 ```
 
@@ -191,8 +191,8 @@ Das Refactoring kann manuell reproduziert werden durch:
 
 1. Zielordner anlegen.
 2. Jenkinsfiles nach `pipelines/legacy/` verschieben.
-3. Deployment-Skripte nach `scripts/deployment/` verschieben.
-4. Root-Operations-Skripte nach `scripts/ops/` verschieben.
+3. Deployment-Skripte nach `infrastructure/helpers/deployment/` verschieben.
+4. Root-Operations-Skripte nach `infrastructure/helpers/ops/` verschieben.
 5. Ansible, PMAN und update-stack in `infrastructure/`, `data/`, `config/` verschieben.
 6. V2-Jenkinsfiles unter `pipelines/v2/` aus den Legacy-Jenkinsfiles erzeugen.
 7. V2-Jenkinsfiles auf Shared-Library-Helfer und neue Pfade aktualisieren.

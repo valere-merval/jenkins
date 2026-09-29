@@ -424,7 +424,7 @@ def clear_csv(psxEnv) {
 
 def update_config(psxEnv, vr_setting) {
     catchError {
-        dir("scripts/deployment") {
+        dir("infrastructure/helpers/deployment") {
             sh """
                 ./plandatenVorschauRuesckschau_updateConfig.sh \'${vr_setting}\' \'${psxEnv}\'
             """

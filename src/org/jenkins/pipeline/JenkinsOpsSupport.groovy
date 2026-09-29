@@ -97,7 +97,7 @@ def runDeploymentScriptCommand(String shellCode, Map config = [:]) {
 
 /**
  * Backwards-compatible deployment command helper for V2 Jenkinsfiles.
- * Executes a shell command from scripts/deployment inside the configured ssh-agent.
+ * Executes a shell command from infrastructure/helpers/deployment inside the configured ssh-agent.
  */
 def runDeploymentShell(String shellCode, Map config = [:]) {
     runDeploymentScriptCommand(shellCode, config)

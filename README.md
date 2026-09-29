@@ -14,10 +14,11 @@ Die Implementierung ist vollständig in fachliche Zielbereiche verschoben. Alte 
 ├── resources/org/jenkins/         # Shared-Library-Ressourcen, z. B. Pipeline-Katalog
 ├── pipelines/v2/                  # Neue, ausführbare Ziel-Pipelines mit @Library('jenkins')
 ├── pipelines/legacy/              # Migrierte Legacy-Jenkinsfiles als Referenz/Fallback
-├── scripts/deployment/            # Migrierte Deployment-Shell-Skripte und Hilfsdateien
-├── scripts/ops/                   # Ehemalige Root-Operations-Skripte
+├── infrastructure/helpers/deployment/            # Migrierte Deployment-Shell-Skripte und Hilfsdateien
+├── infrastructure/helpers/ops/                   # Ehemalige Root-Operations-Skripte
+├── infrastructure/helpers/python/                # Python-Hilfsskripte
 ├── infrastructure/ansible/        # Ansible-Playbooks, Inventories, Rollen und Templates
-├── data/pman/                     # PMAN-Konfigurationen und Runner
+├── config/pman/                     # PMAN-Konfigurationen und Runner
 ├── config/update-stack/           # Stack-/Umgebungskonfigurationen
 ├── config/*.groovy                # Jenkins-Konfigurationsgeneratoren/-Beispiele
 ├── legacy/obsolete/               # Eindeutig obsolete/alte Artefakte
