@@ -1,96 +1,30 @@
-# Jenkins
+# Jenkins Pipelines
 
-Professionelles Jenkins-/DevOps-Plattform-Repository für BIBE/TPO-Daten- und Software-Deployments, PSX-Umgebungssteuerung, Jenkins-/AWS-Wartung und operative Betriebsautomatisierung.
+Repository for the pipeline-specific Jenkinsfiles and runtime assets.
 
-## Architektur in einem Satz
+## What lives here
 
-Die Implementierung ist vollständig in fachliche Zielbereiche verschoben. Alte Root- und Compatibility-Symlinks wurden entfernt; die produktiven Ziel-Pipelines liegen jetzt als echte Shared-Library-basierte V2-Jenkinsfiles vor.
+- `pipelines/v2/` – current Jenkinsfiles
+- `pipelines/legacy/` – legacy Jenkinsfiles kept as reference/fallback
+- `infrastructure/helpers/` – deployment, ops, and Python helper scripts used by the pipelines
+- `infrastructure/ansible/` – Ansible content used by the pipelines
+- `config/pman/` and `config/update-stack/` – runtime config and stack inputs
+- `config/*.groovy` – config generators used by the pipeline flows
+- `legacy/obsolete/` – archived obsolete artifacts
+- `docs/` – repo documentation
 
-## Zielstruktur
+## Shared library
 
-```text
-├── vars/                         # Schlanke Jenkins Shared Library Fassaden
-├── src/org/jenkins/               # Groovy-Klassen, Konstanten und wiederverwendbare Logik
-├── resources/org/jenkins/         # Shared-Library-Ressourcen, z. B. Pipeline-Katalog
-├── pipelines/v2/                  # Neue, ausführbare Ziel-Pipelines mit @Library('jenkins')
-├── pipelines/legacy/              # Migrierte Legacy-Jenkinsfiles als Referenz/Fallback
-├── infrastructure/helpers/deployment/            # Migrierte Deployment-Shell-Skripte und Hilfsdateien
-├── infrastructure/helpers/ops/                   # Ehemalige Root-Operations-Skripte
-├── infrastructure/helpers/python/                # Python-Hilfsskripte
-├── infrastructure/ansible/        # Ansible-Playbooks, Inventories, Rollen und Templates
-├── config/pman/                     # PMAN-Konfigurationen und Runner
-├── config/update-stack/           # Stack-/Umgebungskonfigurationen
-├── config/*.groovy                # Jenkins-Konfigurationsgeneratoren/-Beispiele
-├── legacy/obsolete/               # Eindeutig obsolete/alte Artefakte
-└── docs/                          # Deutsche Architektur- und Refactoring-Dokumentation
-```
+The shared Jenkins library has moved to a separate repository:
 
-## Wichtige Script Paths
+- Repository: `https://github.com/valere-merval/jenkins-library.git`
+- Library name in Jenkins: `jenkins`
+- Usage in Jenkinsfiles: `@Library('jenkins') _`
 
-Jenkins-Jobs sollen auf die neuen V2-Pfade umgestellt werden, z. B.:
-
-```text
-pipelines/v2/deployment/BIBE_SWEinsatz.Jenkinsfile
-pipelines/v2/deployment/TPO_SWEinsatz.Jenkinsfile
-pipelines/v2/deployment/BIBE_TPO_DataDeployment.Jenkinsfile
-pipelines/v2/configuration/modifyConfigurationGroovy.Jenkinsfile
-```
-
-Die Legacy-Pfade unter `pipelines/legacy/` bleiben als Referenz/Fallback im Repository, sind aber nicht mehr die Zielarchitektur.
-
-## Jenkins Shared Library
-
-Empfohlene Jenkins-Konfiguration:
-
-- **Name**: `jenkins`
-- **Default version**: `main`
-- **Repository**: `https://github.com/valere-merval/jenkins.git`
-
-Verwendung:
-
-```groovy
-@Library('jenkins') _
-```
-
-`vars/` enthält nur noch kurze globale Jenkins-Fassaden. Die wiederverwendbare Logik liegt in `src/org/jenkins/pipeline/` und wird dort über gemeinsame Basisklassen gekapselt.
-
-Zentrale Fassaden:
-
-```groovy
-jenkinsOps.defaultAgentLabel()
-jenkinsOps.withDeploymentScripts { ... }
-jenkinsOps.withSshAgent { ... }
-jenkinsOps.withPman { ... }
-jenkinsOps.withUpdateStack { ... }
-jenkinsOps.triggerJob('job-name', [FLAG: true], [wait: true])
-jsDataDeployment.bibeTpoParameters()
-jsSoftwareDeployment.bibeParameters(stageParamsMap)
-jsEnvironmentControl.prepareConfigurationFiles(stageParamsMap, params, parentDir, configPath)
-jsConfigurationGroovy.applyConfiguration(configurationMap, configPath)
-```
-
-## Dokumentation
-
-- [Architektur](docs/ARCHITECTURE.md)
-- [Refactoring](docs/REFACTORING.md)
-- [Vergleich alt vs. neu](docs/ALT_NEU_VERGLEICH.md)
-
-## Validierung
+## Validation
 
 ```bash
 make validate
 ```
 
-Die Validierung prüft:
-
-- Zielstruktur,
-- kanonische V2- und Legacy-Pfade,
-- vollständige V2-Abdeckung für alle Legacy-Jenkinsfiles,
-- dass V2 keine Legacy-Delegationswrapper mehr enthält,
-- dass `vars/` schlank bleibt und Pipeline-Logik in `src/` liegt,
-- dass keine Symlinks mehr im Repository liegen,
-- Whitespace-Probleme im Git-Diff.
-
-## Commit-Strategie
-
-Die komplette Restrukturierung ist bewusst in einem einzigen Commit zusammengefasst, damit sie manuell nachvollzogen oder reproduziert werden kann.
+The validation checks the pipeline repository layout, canonical pipeline paths, and whitespace in the git diff.
