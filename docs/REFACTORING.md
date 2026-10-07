@@ -128,28 +128,18 @@ Legacy bleibt als Referenz/Fallback unter `pipelines/legacy/` erhalten.
 
 ## Shared Library
 
-Die Jenkins Shared Library bleibt am Root, weil Jenkins diese Struktur erwartet:
+Die Jenkins Shared Library lebt jetzt in einem separaten Repository:
 
 ```text
-vars/
-src/
-resources/
+https://github.com/valere-merval/jenkins-library.git
 ```
 
-`vars/` ist nur noch die Jenkins-kompatible Einstiegsschicht. Wiederverwendbare Pipeline-Implementierungen liegen in `src/org/jenkins/pipeline/` und teilen sich `AbstractPipelineScript`, damit Pipeline Steps aus Klassen heraus genutzt werden können.
+Dieses Repo behält nur die pipeline-spezifischen Jenkinsfiles, Runtime-Skripte und Konfigurationen. Die gemeinsam genutzten Jenkins-Fassaden und Klassen liegen in der ausgelagerten Library.
 
-Zentrale Fassaden:
+Verwendung in den Pipelines:
 
-```text
-vars/jenkinsOps.groovy
-vars/jsSoftwareDeployment.groovy
-vars/jsDataDeployment.groovy
-```
-
-Namespace:
-
-```text
-org.jenkins
+```groovy
+@Library('jenkins') _
 ```
 
 ## Obsolete Dateien

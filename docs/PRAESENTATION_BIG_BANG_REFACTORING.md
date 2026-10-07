@@ -18,7 +18,7 @@ Das Big-Bang-Refactoring hat das Repository in eine professionelle DevOps-Plattf
 
 - klare Trennung von Pipelines, Shared Library, Scripts, Infrastruktur, Daten und Konfiguration,
 - vollständige V2-Jenkinsfiles für alle Legacy-Pipelines,
-- zentrale Jenkins Shared Library unter `vars/`, `src/` und `resources/`,
+- zentrale Jenkins Shared Library in einem separaten Repository,
 - Legacy-Jenkinsfiles bleiben als Referenz/Fallback erhalten,
 - keine Compatibility-Symlinks mehr im aktiven Repository,
 - zentrale Validierung über `make validate` und Root-`Jenkinsfile`,
@@ -172,47 +172,25 @@ pipelines/v2/configuration/modifyConfigurationGroovy.Jenkinsfile
 
 ---
 
-## 6. Jenkins Shared Library
+### 6. Shared Library
 
-Die Shared Library ist die Plattformschicht der neuen Architektur.
+Die Shared Library wurde in das separate Repository `valere-merval/jenkins-library` ausgelagert.
 
-Jenkins erwartet für Shared Libraries diese Root-Struktur:
+Dieses Repo enthält nur noch pipeline-spezifische Jenkinsfiles, Runtime-Skripte und Konfigurationen.
 
-```text
-vars/
-src/
-resources/
+Die Library stellt weiterhin die gleichen Fassaden bereit, die in den Pipelines genutzt werden, insbesondere:
+
+```groovy
+@Library('jenkins') _
+jenkinsOps.*
+jsDataDeployment.*
+jsSoftwareDeployment.*
+jsEnvironmentControl.*
+jsConfigurationGroovy.*
+jsConfigFile.*
+jsAws.*
+jsQuality.*
 ```
-
-### Zentrale Dateien
-
-```text
-vars/jenkinsOps.groovy
-vars/jsDataDeployment.groovy
-vars/jsSoftwareDeployment.groovy
-vars/jsEnvironmentControl.groovy
-vars/jsConfigurationGroovy.groovy
-vars/jsConfigFile.groovy
-vars/jsDeployment.groovy
-vars/jsAws.groovy
-vars/jsQuality.groovy
-src/org/jenkins/Defaults.groovy
-resources/org/jenkins/pipeline-catalog.yml
-```
-
-### Verantwortlichkeiten
-
-| Datei | Verantwortung |
-|---|---|
-| `jenkinsOps.groovy` | zentrale Fassade für Agent, Credentials, Arbeitsverzeichnisse, Conditional-Stages, Trigger, Config-Lesen |
-| `jsDataDeployment.groovy` | Parameter und PMAN-Datenstrukturen für BIBE/TPO-Dateneinsatz |
-| `jsSoftwareDeployment.groovy` | BIBE/TPO-Software-Deployment-Parameter und Stage-Orchestrierung |
-| `jsEnvironmentControl.groovy` | Ein-/Ausschalten von PSX-Umgebungen, AMI-Handling, Stack-Updates |
-| `jsConfigurationGroovy.groovy` | Pflege von `Configuration.groovy`, Backup, Parsing, Generierung |
-| `jsConfigFile.groovy` | wiederverwendbare Datei-/Config-Manipulationen |
-| `jsAws.groovy` | AWS-bezogene Hilfsfunktionen |
-| `jsQuality.groovy` | Validierungs- und Qualitätshelfer |
-| `Defaults.groovy` | zentrale Konstanten wie Agent Label, Credential-ID, Standardpfade |
 
 ### Beispiel: vorher
 
