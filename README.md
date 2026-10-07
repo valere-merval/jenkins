@@ -9,7 +9,6 @@ Repository for the pipeline-specific Jenkinsfiles and runtime assets.
 - `infrastructure/helpers/` – deployment, ops, and Python helper scripts used by the pipelines
 - `infrastructure/ansible/` – Ansible content used by the pipelines
 - `config/pman/` and `config/update-stack/` – runtime config and stack inputs
-- `config/*.groovy` – config generators used by the pipeline flows
 - `legacy/obsolete/` – archived obsolete artifacts
 - `docs/` – repo documentation
 

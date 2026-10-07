@@ -19,7 +19,6 @@ jenkins/
 ├── infrastructure/ansible/        # Reale Ansible-Struktur
 ├── config/pman/                     # Reale PMAN-Struktur
 ├── config/update-stack/           # Reale Stack-/Umgebungskonfigurationen
-├── config/*.groovy                # Jenkins-Konfigurationsgeneratoren und Beispiele
 ├── legacy/obsolete/               # Archivierte, obsolete Artefakte
 ├── docs/                          # Deutsche Dokumentation
 ├── Jenkinsfile                    # Jenkins-Validierung des Repository-Layouts

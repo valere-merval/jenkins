@@ -20,6 +20,8 @@ validate-layout:
 	@test ! -d vars
 	@test ! -d resources
 	@test ! -d test
+	@test ! -f config/jenkins-configuration-builder.groovy
+	@test ! -f config/jenkins-configuration.example.groovy
 	@echo "Layout validation passed."
 
 validate-canonical-paths:
